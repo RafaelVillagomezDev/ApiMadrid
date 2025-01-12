@@ -1,8 +1,8 @@
-import {getRestaurant} from "../../controllers/restaurant-controller";
-const express = require('express');
-const router = express.Router();
+import RestaurantController from '../../controllers/restaurant-controller';
+import express, { Router } from 'express';
+import { RestaurantSchema } from '../../schemas/restaurant-schema';
+const router: Router = express.Router();
 
+router.post('/create', RestaurantSchema.create, RestaurantController.createRestaurant);
 
-router.get('/',getRestaurant);
-
-export default router
+export default router;
