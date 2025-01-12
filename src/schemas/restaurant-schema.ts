@@ -3,42 +3,58 @@ import { checkSchema } from 'express-validator';
 const RestaurantSchema = {
   create: checkSchema({
     address: {
-      in: ["body"],
-      errorMessage: "Dirección inválida",
+      in: ['body'],
+      errorMessage: 'Dirección inválida',
       trim: true,
       escape: true,
       isLength: {
         options: { max: 50 },
-        errorMessage: "La  dirección tener máximo 30 caracteres",
+        errorMessage: 'La  dirección tener máximo 30 caracteres',
       },
       matches: {
         options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{4,}$/,
-        errorMessage: "La dirección debe tener al menos 4 caracteres alfanuméricos",
+        errorMessage:
+          'La dirección debe tener al menos 4 caracteres alfanuméricos',
       },
     },
-    
+
     name: {
-      in: ["body"],
-      errorMessage: "Nombre inválido ",
+      in: ['body'],
+      errorMessage: 'Nombre inválido ',
       trim: true,
       escape: true,
-      notEmpty:{
-        errorMessage:"El nombre es obligatorio"
+      exists: {
+        options: {
+          checkNull: true, // Considera null como no existente
+          checkFalsy: true, // Considera cualquier valor "falsy" ("" o 0, por ejemplo) como no existente
+        },
+        errorMessage: 'El nombre es obligatorio', // Este mensaje será lanzado si no existe el valor
+      },
+      optional: {
+        options: { nullable: true }, // No ejecuta las validaciones si el campo es falsy (vacío, null, etc.)
       },
       isLength: {
         options: { max: 30 },
-        errorMessage: "El nombre debe tener máximo 30 caracteres",
+        errorMessage: 'El nombre debe tener máximo 30 caracteres',
       },
       matches: {
         options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{4,}$/,
-        errorMessage: "El nombre debe tener al menos 4 caracteres alfanuméricos",
+        errorMessage:
+          'El nombre debe tener al menos 4 caracteres alfanuméricos',
       },
     },
     email: {
       in: ['body'],
       errorMessage: 'Email inválido',
-      notEmpty:{
-        errorMessage:"El email es obligatorio"
+      exists: {
+        options: {
+          checkNull: true, // Considera null como no existente
+          checkFalsy: true, // Considera cualquier valor "falsy" ("" o 0, por ejemplo) como no existente
+        },
+        errorMessage: 'El email es obligatorio', // Este mensaje será lanzado si no existe el valor
+      },
+      optional: {
+        options: { nullable: true }, // No ejecuta las validaciones si el campo es falsy (vacío, null, etc.)
       },
       isLength: {
         options: { max: 50 },

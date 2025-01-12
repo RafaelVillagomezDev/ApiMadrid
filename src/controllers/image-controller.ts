@@ -5,8 +5,8 @@ import { RestaurantInterface } from 'restaurant-type';
 import { RestaurantFactory } from '../factory/restaurant-factory';
 import { v4 as uuidv4 } from 'uuid';
 
-const RestaurantController = {
-  createRestaurant: async (
+const ImageController = {
+  createImage: async (
     req: Request,
     res: Response<ApiResponseInterface>,
     next: NextFunction,
@@ -24,19 +24,8 @@ const RestaurantController = {
         return;
       }
 
-      const validData = matchedData(req);
-
-      const restaurant: RestaurantInterface = {
-        id: await uuidv4(),
-        email: validData.email,
-        name: validData.name,
-        address: validData.address,
-      };
-
-      await RestaurantFactory.createRestaurant(restaurant);
-
       const response: ApiResponseInterface = {
-        message: 'Restaurante creado con éxito',
+        message: 'Imagen creada con éxito',
         code: 200,
       };
 
@@ -47,4 +36,4 @@ const RestaurantController = {
   },
 };
 
-export default RestaurantController;
+export default ImageController;

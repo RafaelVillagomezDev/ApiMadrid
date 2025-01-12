@@ -5,7 +5,6 @@ import path from 'path';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-
 if (
   !process.env.DBHOST ||
   !process.env.DBUSER ||
@@ -35,6 +34,5 @@ const connection: BdInterface = {
 
 // Crear el pool de conexiones
 const pool = mysql.createPool(connection);
-
 
 export { pool };

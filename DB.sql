@@ -9,3 +9,10 @@ CREATE TABLE RESTAURANT(
     constraint PK_Rol PRIMARY KEY (Id),
     UNIQUE (Email) 
 );
+
+CREATE TABLE IMAGES (
+    Id CHAR(36) PRIMARY KEY, 
+    RestaurantId CHAR(36),  
+    Url VARCHAR(255), 
+    CONSTRAINT FK_Restaurant FOREIGN KEY (RestaurantId) REFERENCES RESTAURANT(Id) ON DELETE CASCADE
+);
