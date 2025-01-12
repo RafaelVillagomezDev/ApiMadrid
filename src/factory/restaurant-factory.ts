@@ -1,19 +1,12 @@
 import { RestaurantInterface } from 'restaurant-type';
-import {Restaurant} from '../models/restaurant/restaurant-model';
+import { Restaurant } from '../models/restaurant/restaurant-model';
+
 class RestaurantFactory {
   static async createRestaurant(obj: RestaurantInterface) {
-    try {
-
-      const restaurant=new Restaurant(obj)
-      const rows=await restaurant.createRestaurant()
-      
-      return rows
-    } catch (error:any) {
-      
-      throw new Error('No se pudo crear el restaurante. No se afectaron filas.')
-
-      
-    }
+    const restaurant = new Restaurant(obj);
+    await restaurant.existRestaurant();
+    const rows = await restaurant.createRestaurant();
+    return rows;
   }
 }
-export { RestaurantFactory};
+export { RestaurantFactory };

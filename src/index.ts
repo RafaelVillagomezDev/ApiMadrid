@@ -4,15 +4,15 @@ import morgan from 'morgan';
 import cors from 'cors';
 import path from 'path';
 import dotenv from 'dotenv';
-import {errorHandler} from './middleware/error-middleware';
+import { errorHandler } from './middleware/error-middleware';
 
-dotenv.config({ path: path.resolve(__dirname, '../.env')})
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
-const customFormat =':method :url :status :res[content-length] - :response-time ms :remote-addr';
+const customFormat =
+  ':method :url :status :res[content-length] - :response-time ms :remote-addr';
 // Usar morgan con el formato personalizado
 app.use(morgan(customFormat));
-
 
 app.use(cors());
 app.use(express.json());
@@ -27,4 +27,4 @@ app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
 
-app.use(errorHandler)
+app.use(errorHandler);

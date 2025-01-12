@@ -1,6 +1,11 @@
-const createRestaurant = () => {
-    const query = `INSERT IGNORE INTO RESTAURANT (Id,Email,Name,Address) VALUES (?, ?, ?, ?);`;
-    return query;
+const createRestaurant = (): string => {
+  const query = `INSERT IGNORE INTO RESTAURANT (Id,Email,Name,Address) VALUES (?, ?, ?, ?);`;
+  return query;
 };
 
-export {createRestaurant}
+const existRestaurant = (): string => {
+  const query = 'SELECT * FROM `restaurant` WHERE `email` = ?;';
+  return query;
+};
+
+export { createRestaurant, existRestaurant };

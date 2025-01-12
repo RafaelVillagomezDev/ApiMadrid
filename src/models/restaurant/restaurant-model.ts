@@ -1,6 +1,9 @@
 import { RestaurantInterface } from 'restaurant-type';
-import { createRestaurant } from "../../queries/restaurant-query";
-import { pool } from "../../connection/bd";
+import {
+  createRestaurant,
+  existRestaurant,
+} from '../../queries/restaurant-query';
+import { pool } from '../../connection/bd';
 import { ResultSetHeader } from 'mysql2';
 
 // Obtener el pool de promesas
@@ -19,27 +22,37 @@ class Restaurant {
     this.address = address;
   }
 
-  
   async createRestaurant(): Promise<number> {
-    const queryCreate = createRestaurant(); 
-    try {
-      // Ejecutar la consulta usando el pool de promesas
-      const [result] = await promisePool.query<ResultSetHeader>(queryCreate, [
-        this.id,
-        this.email,
-        this.name,
-        this.address,
-      ]);
+    const queryCreate = createRestaurant();
 
-      if (result.affectedRows === 0) {
-        throw new Error('No se pudo crear el restaurante ');
-      }
+    // Ejecutar la consulta usando el pool de promesas
+    const [result] = await promisePool.query<ResultSetHeader>(queryCreate, [
+      this.id,
+      this.email,
+      this.name,
+      this.address,
+    ]);
 
-      return result.affectedRows; 
-    } catch (error: any) {
-      
-      throw new Error(`Error : ${error.message || 'Desconocido'}`); 
+    if (result.affectedRows === 0) {
+      throw new Error('No se pudo crear el restaurante ');
     }
+
+    return result.affectedRows;
+  }
+
+  async existRestaurant(): Promise<number> {
+    const queryExist = existRestaurant();
+
+    // Ejecutar la consulta usando el pool de promesas
+    const [rows]: [any[], any] = await promisePool.query(queryExist, [
+      this.email,
+    ]);
+
+    if (rows.length > 0) {
+      throw new Error('Ya existe ese restaurante en nuestra bbdd');
+    }
+
+    return rows.length;
   }
 }
 
