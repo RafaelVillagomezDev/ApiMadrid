@@ -6,6 +6,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { errorHandler } from './middleware/error-middleware';
 
+
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();

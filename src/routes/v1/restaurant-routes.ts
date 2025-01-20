@@ -12,5 +12,4 @@ router.post(
 );
 
 router.post('/:id/image', ImageSchema.create, ImageController.createImage);
-
 export default router;
