@@ -1,18 +1,17 @@
 CREATE DATABASE DB_APIMADRID;
 USE DB_APIMADRID;
 
-CREATE TABLE RESTAURANT(
-    Id char(36),
-    Email varchar(50),
-    Name varchar (30),
-    Address varchar(50),
-    constraint PK_Rol PRIMARY KEY (Id),
-    UNIQUE (Email) 
+CREATE TABLE IMAGES (
+    Id CHAR(36) PRIMARY KEY,
+    RelatedId CHAR(36),
+    RelatedType VARCHAR(50),
+    Url VARCHAR(255),
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IMAGES (
-    Id CHAR(36) PRIMARY KEY, 
-    RestaurantId CHAR(36),  
-    Url VARCHAR(255), 
-    CONSTRAINT FK_Restaurant FOREIGN KEY (RestaurantId) REFERENCES RESTAURANT(Id) ON DELETE CASCADE
+CREATE TABLE RESTAURANT (
+    Id CHAR(36) PRIMARY KEY,
+    Name VARCHAR(50),
+    Email VARCHAR(50),
+    Address VARCHAR(100)
 );

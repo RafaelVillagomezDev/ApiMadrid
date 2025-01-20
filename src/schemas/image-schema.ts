@@ -9,31 +9,32 @@ const ImageSchema = {
       trim: true,
       escape: true,
     },
-    url: {
+    relatedType: {
       in: ['body'],
-      isURL: {
-        errorMessage: 'La URL proporcionada no es válida',  
-      },
-      notEmpty: {
-        errorMessage: 'La URL es obligatoria',  
-      },
-      customSanitizer: {
-        options: (value: string) => {
-          // Verifica si el protocolo es http y lo reemplaza por https
-          if (value.startsWith('http://')) {
-            return value.replace('http://', 'https://');
-          }
-          // Si no es http, asegúrate que sea https
-          if (!value.startsWith('https://')) {
-            throw new Error('La URL debe tener el protocolo https:// y es obligatotia');
-          }
-          return value;
+      errorMessage: 'Typo de dato debe ser un nombre valido',
+      exists: {
+        options: {
+          checkNull: true,
+          checkFalsy: true,
         },
+        errorMessage: 'El relatedType es obligatorio',
       },
-    }
-    
+      optional: {
+        options: { nullable: true }, // No ejecuta las validaciones si el campo es falsy (vacío, null, etc.)
+      },
+      isLength: {
+        options: { max: 50 },
+        errorMessage: 'El relatedType debe tener maximo 50 caracteres',
+      },
+      trim: true,
+      escape: true,
+      matches: {
+        options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{4,}$/,
+        errorMessage:
+          'El relatedType debe tener al menos 4 caracteres alfanuméricos',
+      },
+    },
   }),
- 
 };
 
 export { ImageSchema };

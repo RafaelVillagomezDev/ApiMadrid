@@ -1,9 +1,9 @@
 import { ApiResponseInterface } from 'api-type';
 import { Request, Response, NextFunction } from 'express';
 import { matchedData, validationResult } from 'express-validator';
-import { RestaurantInterface } from 'restaurant-type';
-import { RestaurantFactory } from '../factory/restaurant-factory';
 import { v4 as uuidv4 } from 'uuid';
+import { ImageInterface } from 'image-type';
+import { ImageFactory } from '../factory/image-factory';
 
 const ImageController = {
   createImage: async (
@@ -14,7 +14,7 @@ const ImageController = {
     try {
       const errors = validationResult(req);
       const errorResponse: ApiResponseInterface = {
-        message: 'Validation failed',
+        message: 'Error en validación',
         data: errors.array(),
         code: 400,
       };
@@ -23,6 +23,17 @@ const ImageController = {
         res.status(400).json(errorResponse);
         return;
       }
+
+      const validData = matchedData(req);
+
+      const image: ImageInterface = {
+        id: await uuidv4(),
+        relatedId: await uuidv4(),
+        relatedType: validData.relatedType,
+        url: 'pepe',
+      };
+
+      await ImageFactory.createImage(image);
 
       const response: ApiResponseInterface = {
         message: 'Imagen creada con éxito',

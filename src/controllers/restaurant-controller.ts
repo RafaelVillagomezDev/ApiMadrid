@@ -14,7 +14,7 @@ const RestaurantController = {
     try {
       const errors = validationResult(req);
       const errorResponse: ApiResponseInterface = {
-        message: 'Validation failed',
+        message: 'Error en validación',
         data: errors.array(),
         code: 400,
       };
