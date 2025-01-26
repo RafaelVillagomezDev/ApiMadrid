@@ -4,4 +4,5 @@ interface ApiResponseInterface<T = Record<string, unknown>> {
   code: number;
 }
 
+
 export { ApiResponseInterface };
