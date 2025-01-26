@@ -1,46 +1,54 @@
-import { ApiResponseInterface } from 'api-type';
 import { Request, Response, NextFunction } from 'express';
-import { matchedData, validationResult } from 'express-validator';
+import { validationResult, matchedData } from 'express-validator';
 import { v4 as uuidv4 } from 'uuid';
-import { ImageInterface } from 'image-type';
+import { ApiResponseInterface } from '../types/api-type';
+import { ImageInterface } from '../types/image-type';
+import { uploadImagesToCloudinary } from '../utils/cloudinary';
 import { ImageFactory } from '../factory/image-factory';
+import * as Multer from 'multer';
 
 const ImageController = {
   createImage: async (
     req: Request,
     res: Response<ApiResponseInterface>,
-    next: NextFunction,
+    next: NextFunction
   ): Promise<void> => {
     try {
-      const errors = validationResult(req);
-      const errorResponse: ApiResponseInterface = {
-        message: 'Error en validación',
-        data: errors.array(),
-        code: 400,
-      };
-
+      // Validación de la entrada
+      /*const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        res.status(400).json(errorResponse);
-        return;
+         res.status(400).json({
+          message: 'Error en la validación de los datos.',
+          data: errors.array(),
+          code: 400,
+        });
+        return
       }
 
+      // Extraer los datos validados
       const validData = matchedData(req);
+      const { relatedId, relatedType } = validData;*/
 
-      const image: ImageInterface = {
-        id: await uuidv4(),
-        relatedId: await uuidv4(),
-        relatedType: validData.relatedType,
-        url: 'pepe',
-      };
+      const urls = []
+      let files: any
+      files = req.files
 
-      await ImageFactory.createImage(image);
+      for (const file of files) {
+          
 
-      const response: ApiResponseInterface = {
+          const newPath = await uploadImagesToCloudinary(file)
+          urls.push(newPath)
+      }
+
+      const multiImage = urls.map((url: any) => url)  
+   
+      res.status(200).json({
         message: 'Imagen creada con éxito',
         code: 200,
-      };
-
-      res.status(200).send(response);
+        data:multiImage
+      }
+        
+      )
     } catch (error) {
       next(error);
     }

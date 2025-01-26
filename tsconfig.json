@@ -14,8 +14,9 @@
   },
 
   "include": [
-    "src/**/*.ts", // Archivos .ts en la carpeta src
-    "src/**/*.tsx" // Archivos .tsx en la carpeta src
+    "src/**/*.ts",    // Incluye todos los archivos .ts en src
+    "src/**/*.tsx",   // Incluye todos los archivos .tsx en src
+    "express.d.ts"
   ],
   "exclude": [
     "node_modules" // Excluir la carpeta node_modules
