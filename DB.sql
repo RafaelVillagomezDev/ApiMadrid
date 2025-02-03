@@ -5,7 +5,7 @@ CREATE TABLE IMAGES (
     Id CHAR(36) PRIMARY KEY,
     RelatedId CHAR(36),
     RelatedType VARCHAR(50),
-    Url VARCHAR(255),
+    Url JSON,
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -14,8 +14,8 @@ const ImageController = {
     next: NextFunction
   ): Promise<void> => {
     try {
-      // Validación de la entrada
-      /*const errors = validationResult(req);
+     
+      const errors = validationResult(req);
       if (!errors.isEmpty()) {
          res.status(400).json({
           message: 'Error en la validación de los datos.',
@@ -27,7 +27,7 @@ const ImageController = {
 
       // Extraer los datos validados
       const validData = matchedData(req);
-      const { relatedId, relatedType } = validData;*/
+      const { relatedId, relatedType } = validData;
 
       const urls = []
       let files: any
@@ -41,11 +41,19 @@ const ImageController = {
       }
 
       const multiImage = urls.map((url: any) => url)  
+      
+      const image: ImageInterface = {
+        id: await uuidv4(),
+        relatedId: relatedId,
+        relatedType: relatedType,
+        url: multiImage,
+      }
+
+      await ImageFactory.createImage(image);
    
       res.status(200).json({
         message: 'Imagen creada con éxito',
-        code: 200,
-        data:multiImage
+        code: 200
       }
         
       )

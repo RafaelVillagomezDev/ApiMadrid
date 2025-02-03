@@ -27,5 +27,5 @@ const uploadImagesToCloudinary = async (file: Express.Multer.File) => {
     });
   });
 };
-
+ 
 export { uploadImagesToCloudinary };

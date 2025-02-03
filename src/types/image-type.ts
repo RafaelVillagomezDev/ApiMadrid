@@ -4,7 +4,7 @@ interface ImageInterface {
   id: string;
   relatedId: string;
   relatedType: string;
-  url: string;
+  url: string[];
 }
 
 interface CloudinaryConfig {

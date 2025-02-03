@@ -6,7 +6,7 @@ import { upload } from '../../utils/multer';
 const router: Router = express.Router();
 
 router.post(
-  '/create/:id',
+  '/create/:relatedType/:relatedId',
   ImageSchema.create,
   upload.array("images"),
   ImageController.createImage,
