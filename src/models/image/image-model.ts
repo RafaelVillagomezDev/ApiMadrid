@@ -10,7 +10,7 @@ class Image {
   id: string;
   relatedId: string;
   relatedType: string;
-  url: string;
+  url: string[];
 
   constructor({ id, relatedId, relatedType, url }: ImageInterface) {
     this.id = id;
@@ -20,20 +20,32 @@ class Image {
   }
 
   async createImage(): Promise<number> {
-    const queryCreate = createImage();
-    // Ejecutar la consulta usando el pool de promesas
-    const [result] = await promisePool.query<ResultSetHeader>(queryCreate, [
-      this.id,
-      this.relatedId,
-      this.relatedType,
-      this.url,
-    ]);
-
-    if (result.affectedRows === 0) {
-      throw new Error('No se pudo crear la imagen ');
+    const connection = await promisePool.getConnection(); 
+    await connection.beginTransaction(); 
+  
+    try {
+      const queryCreate = createImage(); 
+  
+      const [result] = await connection.query<ResultSetHeader>(queryCreate, [
+        this.id,
+        this.relatedId,
+        this.relatedType,
+        JSON.stringify(this.url), 
+      ]);
+  
+      if (result.affectedRows === 0) {
+        throw new Error('No se pudo crear la imagen');
+      }
+  
+      await connection.commit(); 
+      connection.release(); 
+  
+      return result.affectedRows;
+    } catch (error) {
+      await connection.rollback(); 
+      connection.release(); 
+      throw error; 
     }
-
-    return result.affectedRows;
   }
 
   async existImage(): Promise<number> {
