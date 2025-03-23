@@ -7,7 +7,7 @@ import LocationController from '../../controllers/location-controller';
 const router: Router = express.Router();
 
 router.post(
-  '/create/:id',
+  '/create/:relatedType/:relatedId',
   LocationSchema.create,
   LocationController.createLocation
 );

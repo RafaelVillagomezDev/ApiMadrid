@@ -4,7 +4,9 @@ interface GeoData {
   address: string;
   latitud:string;
   longitud:string;
-  
+  country:string;
+  county:string;
+  town:string;
 }
 
 
@@ -19,14 +21,14 @@ const getCoords = (address: string): Promise<GeoData> => {
 
             const geoData={
                 latitud:data["results"][0].geometry.lat,
-                longitud:data["results"][0].geometry.lng
+                longitud:data["results"][0].geometry.lng,
+                address:data["results"][0].formatted,
+                country:data["results"][0].components.country,
+                county:data["results"][0].components.county,
+                town:data["results"][0].components.town
             }
-
-            resolve({
-              latitud: geoData.latitud,
-              longitud: geoData.longitud,
-              address: address,
-            });
+          
+            resolve(geoData);
           } else {
             reject(new Error('No se encontraron coordenadas'));
           }

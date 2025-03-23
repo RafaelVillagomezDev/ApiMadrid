@@ -35,24 +35,28 @@ const LocationController = {
 
 
       const location: LocationInterface = {
-        id_location: validData.id,
+        relatedId: validData.relatedId,
         id: await uuidv4(),
+        relatedType:validData.relatedType,
         address: validData.address,
-        latitud:geoData.latitud,
-        longitud:geoData.longitud
+        latitude:geoData.latitud,
+        longitude:geoData.longitud,
+        country:geoData.country,
+        town:geoData.town,
+        county:geoData.county
       };
 
-      console.log(geoData)
+    
       
       
-      //await LocationFactory.createLocation(location);
+      await LocationFactory.createLocation(location);
 
-      /*const response: ApiResponseInterface = {
-        message: 'Restaurante creado con éxito',
+      const response: ApiResponseInterface = {
+        message: 'Localización creada con éxito',
         code: 200,
-      };*/
+      };
 
-      //res.status(200).send(location);
+      res.status(200).send(response);
 
     } catch (error) {
       next(error);
