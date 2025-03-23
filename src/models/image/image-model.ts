@@ -6,7 +6,7 @@ import { existImage, createImage } from '../../queries/image-query';
 // Obtener el pool de promesas
 const promisePool = pool.promise();
 
-class Image {
+class Image implements ImageInterface {
   id: string;
   relatedId: string;
   relatedType: string;

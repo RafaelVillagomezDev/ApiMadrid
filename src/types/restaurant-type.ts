@@ -3,7 +3,8 @@ interface RestaurantInterface {
   name: string;
   address: string;
   email: string;
-  [key: string]: unknown;
+  description:Text;
+  [key: string]: any;
 }
 
 /**

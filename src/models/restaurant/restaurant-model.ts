@@ -9,17 +9,20 @@ import { ResultSetHeader } from 'mysql2';
 // Obtener el pool de promesas
 const promisePool = pool.promise();
 
-class Restaurant {
+class Restaurant implements RestaurantInterface {
   id: string;
   email: string;
   name: string;
   address: string;
+  description: Text;
 
-  constructor({ id, email, name, address }: RestaurantInterface) {
+  constructor({ id, email, name, address,description }: RestaurantInterface) {
     this.id = id;
     this.email = email;
-    this.name = name;
+    this.name = name; 
     this.address = address;
+    this.description=description;
+
   }
 
   async createRestaurant(): Promise<number> {
@@ -31,6 +34,7 @@ class Restaurant {
       this.email,
       this.name,
       this.address,
+      this.description
     ]);
 
     if (result.affectedRows === 0) {
