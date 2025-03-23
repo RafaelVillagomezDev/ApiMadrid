@@ -3,15 +3,11 @@ import { Location } from '../models/location/location-model';
 
 class LocationFactory {
   static async createLocation(obj: LocationInterface) {
-    const objLocation={
-     ...obj,
-    longitud:"",
-    latitid:""
-    }
-
-    
-    const location = new Location(objLocation);
    
+    const location = new Location(obj);
+    await location.existLocation()
+    const rows = await location.createLocation()
+    return rows;
   }
 }
 export { LocationFactory };

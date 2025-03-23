@@ -1,9 +1,13 @@
 interface LocationInterface {
-    id_location: string;
+    relatedId: string;
+    relatedType:string;
     id:string;
-    latitud:string,
-    longitud:string,
+    latitude:string,
+    longitude:string,
     address: string;
+    country:string,
+    county:string,
+    town:string
   }
   
   

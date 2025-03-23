@@ -1,5 +1,5 @@
 const createRestaurant = (): string => {
-  const query = `INSERT IGNORE INTO RESTAURANT (Id,Email,Name,Address,Description) VALUES (?, ?, ?, ?,?);`;
+  const query = `INSERT IGNORE INTO RESTAURANT (id,email,name,address,description) VALUES (?, ?, ?, ?,?);`;
   return query;
 };
 

@@ -2,21 +2,21 @@ CREATE DATABASE DB_APIMADRID;
 USE DB_APIMADRID;
 
 CREATE TABLE IMAGES (
-    Id CHAR(36) PRIMARY KEY,
-    RelatedId CHAR(36),
-    RelatedType VARCHAR(50),
-    Url VARCHAR(255),
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id CHAR(36) PRIMARY KEY,
+    relatedId CHAR(36),
+    relatedType VARCHAR(50),
+    url VARCHAR(255),
+    rreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE RESTAURANT (
-    Id CHAR(36) PRIMARY KEY,
-    Name VARCHAR(50),
-    Email VARCHAR(50),
-    Address VARCHAR(100)
+    id CHAR(36) PRIMARY KEY,
+    name VARCHAR(50),
+    email VARCHAR(50),
+    address VARCHAR(100)
 );
 
-CREATE TABLE users (
+CREATE TABLE USERS (
     id VARCHAR(255) PRIMARY KEY,  -- ID proporcionado por Google OAuth
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -25,10 +25,23 @@ CREATE TABLE users (
 );
 
 
-CREATE TABLE refresh_tokens (
+CREATE TABLE REFRESH_TOKENS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(255) NOT NULL,
     token TEXT NOT NULL,
     expires_at TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE LOCATION (
+    relatedId CHAR(36) , 
+    id CHAR(36) PRIMARY KEY,
+    relatedType VARCHAR(50),
+    address VARCHAR(500) NOT NULL,
+    latitude VARCHAR (50);
+    longitude:VARCHAR(50);
+    town:VARCHAR(30);
+    country: VARCHAR(30);
+    county: VARCHAR(30);
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

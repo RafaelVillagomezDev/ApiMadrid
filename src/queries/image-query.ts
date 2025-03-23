@@ -1,5 +1,5 @@
 const createImage = (): string => {
-  const query = `INSERT INTO IMAGES (Id, RelatedId, RelatedType, Url) VALUES (?, ?, ?, ?)`;
+  const query = `INSERT INTO IMAGES (id, relatedId, relatedType, url) VALUES (?, ?, ?, ?)`;
   return query;
 };
 
