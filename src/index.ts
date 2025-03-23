@@ -1,6 +1,7 @@
 import express , {Application} from 'express';
 import restaurantRoutes from './routes/v1/restaurant-routes';
 import imageRoutes from './routes/v1/image-routes'
+import locationRoutes from './routes/v1/location-routes';
 import morgan from 'morgan';
 import cors from 'cors';
 import path from 'path';
@@ -22,6 +23,7 @@ const port = 3000;
 
 app.use('/api/v1/restaurant', restaurantRoutes);
 app.use('/api/v1/image', imageRoutes);
+app.use('/api/v1/location', locationRoutes);
 
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);

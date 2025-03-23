@@ -1,12 +1,17 @@
 import { ApiResponseInterface } from 'api-type';
 import { Request, Response, NextFunction } from 'express';
 import { matchedData, validationResult } from 'express-validator';
-import { RestaurantInterface } from 'restaurant-type';
-import { RestaurantFactory } from '../factory/restaurant-factory';
-import { v4 as uuidv4 } from 'uuid';
+import { LocationInterface } from 'location-type';
+import { LocationFactory } from '../factory/location-factory';
 
-const RestaurantController = {
-  createRestaurant: async (
+
+import { v4 as uuidv4 } from 'uuid';
+import { getCoords } from '../utils/geodata';
+
+
+
+const LocationController = {
+  createLocation: async (
     req: Request,
     res: Response<ApiResponseInterface>,
     next: NextFunction,
@@ -26,26 +31,33 @@ const RestaurantController = {
 
       const validData = matchedData(req);
 
-      const restaurant: RestaurantInterface = {
+      const geoData=await getCoords(validData.address);
+
+
+      const location: LocationInterface = {
+        id_location: validData.id,
         id: await uuidv4(),
-        email: validData.email,
-        name: validData.name,
         address: validData.address,
-        description:validData.description
+        latitud:geoData.latitud,
+        longitud:geoData.longitud
       };
 
-      await RestaurantFactory.createRestaurant(restaurant);
+      console.log(geoData)
+      
+      
+      //await LocationFactory.createLocation(location);
 
-      const response: ApiResponseInterface = {
+      /*const response: ApiResponseInterface = {
         message: 'Restaurante creado con éxito',
         code: 200,
-      };
+      };*/
 
-      res.status(200).send(response);
+      //res.status(200).send(location);
+
     } catch (error) {
       next(error);
     }
   },
 };
 
-export default RestaurantController;
+export default LocationController;
