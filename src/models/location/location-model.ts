@@ -42,9 +42,9 @@ class Location implements LocationInterface{
 
     // Ejecutar la consulta usando el pool de promesas
     const [rows]: [any[], any] = await promisePool.query(queryExist, [
-      this.id,
+      this.relatedId,
     ]);
-
+    console.log(rows)
     if (rows.length > 0) {
       throw new Error('Ya existe esa localizacion asociada a un elemento en nuestra bbdd');
     }

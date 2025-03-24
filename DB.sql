@@ -6,7 +6,7 @@ CREATE TABLE IMAGES (
     relatedId CHAR(36),
     relatedType VARCHAR(50),
     url VARCHAR(255),
-    rreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE RESTAURANT (
@@ -24,7 +24,6 @@ CREATE TABLE USERS (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
 CREATE TABLE REFRESH_TOKENS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(255) NOT NULL,
@@ -34,14 +33,14 @@ CREATE TABLE REFRESH_TOKENS (
 );
 
 CREATE TABLE LOCATION (
-    relatedId CHAR(36) , 
     id CHAR(36) PRIMARY KEY,
+    relatedId CHAR(36),
     relatedType VARCHAR(50),
     address VARCHAR(500) NOT NULL,
-    latitude VARCHAR (50);
-    longitude:VARCHAR(50);
-    town:VARCHAR(30);
-    country: VARCHAR(30);
-    county: VARCHAR(30);
+    latitude VARCHAR(50),
+    longitude VARCHAR(50),
+    town VARCHAR(30),
+    country VARCHAR(30),
+    county VARCHAR(30),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
