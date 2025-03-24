@@ -7,5 +7,10 @@ const existRestaurant = (): string => {
   const query = 'SELECT * FROM `restaurant` WHERE `email` = ?;';
   return query;
 };
+const isRestaurant=(): string => {
+  const query = 'SELECT id FROM restaurant WHERE id = ?';
+  return query;
+};
 
-export { createRestaurant, existRestaurant };
+
+export { createRestaurant, existRestaurant ,isRestaurant };
