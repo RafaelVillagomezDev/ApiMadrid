@@ -12,8 +12,9 @@ CREATE TABLE IMAGES (
 CREATE TABLE RESTAURANT (
     id CHAR(36) PRIMARY KEY,
     name VARCHAR(50),
-    email VARCHAR(50),
-    address VARCHAR(100)
+    email VARCHAR(50) UNIQUE,
+    address VARCHAR(100),
+    description TEXT
 );
 
 CREATE TABLE USERS (

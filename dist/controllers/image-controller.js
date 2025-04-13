@@ -10,39 +10,47 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_validator_1 = require("express-validator");
-const restaurant_factory_1 = require("../factory/restaurant-factory");
 const uuid_1 = require("uuid");
-const RestaurantController = {
-    createRestaurant: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const cloudinary_1 = require("../utils/cloudinary");
+const image_factory_1 = require("../factory/image-factory");
+const ImageController = {
+    createImage: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const errors = (0, express_validator_1.validationResult)(req);
-            const errorResponse = {
-                message: 'Error en validación',
-                data: errors.array(),
-                code: 400,
-            };
             if (!errors.isEmpty()) {
-                res.status(400).json(errorResponse);
+                res.status(400).json({
+                    message: 'Error en la validación de los datos.',
+                    data: errors.array(),
+                    code: 400,
+                });
                 return;
             }
+            // Extraer los datos validados
             const validData = (0, express_validator_1.matchedData)(req);
-            const restaurant = {
+            const { relatedId, relatedType } = validData;
+            const urls = [];
+            let files;
+            files = req.files;
+            for (const file of files) {
+                const newPath = yield (0, cloudinary_1.uploadImagesToCloudinary)(file);
+                urls.push(newPath);
+            }
+            const multiImage = urls.map((url) => url);
+            const image = {
                 id: yield (0, uuid_1.v4)(),
-                email: validData.email,
-                name: validData.name,
-                address: validData.address,
-                description: validData.description,
+                relatedId: relatedId,
+                relatedType: relatedType,
+                url: multiImage,
             };
-            yield restaurant_factory_1.RestaurantFactory.createRestaurant(restaurant);
-            const response = {
-                message: 'Restaurante creado con éxito',
+            yield image_factory_1.ImageFactory.createImage(image);
+            res.status(200).json({
+                message: 'Imagen creada con éxito',
                 code: 200,
-            };
-            res.status(200).send(response);
+            });
         }
         catch (error) {
             next(error);
         }
     }),
 };
-exports.default = RestaurantController;
+exports.default = ImageController;

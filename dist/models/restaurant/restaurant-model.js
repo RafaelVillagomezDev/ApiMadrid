@@ -15,28 +15,41 @@ const bd_1 = require("../../connection/bd");
 // Obtener el pool de promesas
 const promisePool = bd_1.pool.promise();
 class Restaurant {
-    constructor({ id, email, name, address }) {
+    constructor({ id, email, name, address, description }) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.address = address;
+        this.description = description;
     }
     createRestaurant() {
         return __awaiter(this, void 0, void 0, function* () {
             const queryCreate = (0, restaurant_query_1.createRestaurant)();
-            try {
-                const [result] = yield promisePool.query(queryCreate, [
-                    this.id,
-                    this.email,
-                    this.name,
-                    this.address,
-                ]);
-                return result.affectedRows;
+            // Ejecutar la consulta usando el pool de promesas
+            const [result] = yield promisePool.query(queryCreate, [
+                this.id,
+                this.email,
+                this.name,
+                this.address,
+                this.description,
+            ]);
+            if (result.affectedRows === 0) {
+                throw new Error('No se pudo crear el restaurante ');
             }
-            catch (error) {
-                console.error('Error creating restaurant:', error);
-                throw new Error('Error while creating the restaurant');
+            return result.affectedRows;
+        });
+    }
+    existRestaurant() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const queryExist = (0, restaurant_query_1.existRestaurant)();
+            // Ejecutar la consulta usando el pool de promesas
+            const [rows] = yield promisePool.query(queryExist, [
+                this.email,
+            ]);
+            if (rows.length > 0) {
+                throw new Error('Ya existe ese restaurante en nuestra bbdd');
             }
+            return rows.length;
         });
     }
 }

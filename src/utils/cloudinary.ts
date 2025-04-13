@@ -14,18 +14,18 @@ const cloudinaryConfig: CloudinaryConfig = {
 
 cloudinary.config(cloudinaryConfig);
 
-
-
 const uploadImagesToCloudinary = async (file: Express.Multer.File) => {
   return new Promise<string>((resolve, reject) => {
     cloudinary.uploader.upload(file.path, (err, res) => {
       if (err) {
-        reject(new Error('Error uploading image to Cloudinary: ' + err.message));
+        reject(
+          new Error('Error uploading image to Cloudinary: ' + err.message),
+        );
       } else {
-        resolve(res?.secure_url || ''); 
+        resolve(res?.secure_url || '');
       }
     });
   });
 };
- 
+
 export { uploadImagesToCloudinary };
