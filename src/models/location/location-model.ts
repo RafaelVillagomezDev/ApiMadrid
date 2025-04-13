@@ -1,42 +1,44 @@
-
-
 import { LocationInterface } from 'location-type';
 import { pool } from '../../connection/bd';
 import { ResultSetHeader } from 'mysql2';
-import {
-  existLocation,createLocation
-} from '../../queries/location-query';
+import { existLocation, createLocation } from '../../queries/location-query';
 // Obtener el pool de promesas
 const promisePool = pool.promise();
 
-class Location implements LocationInterface{
+class Location implements LocationInterface {
   relatedId: string;
-  id:string;
-  latitude:string;
-  longitude:string;
-  address:string;
+  id: string;
+  latitude: string;
+  longitude: string;
+  address: string;
   town: string;
   country: string;
   county: string;
   relatedType: string;
-  
-  
 
-  constructor({ relatedId,id,latitude,longitude,address,country,county,town,relatedType}: LocationInterface) {
+  constructor({
+    relatedId,
+    id,
+    latitude,
+    longitude,
+    address,
+    country,
+    county,
+    town,
+    relatedType,
+  }: LocationInterface) {
     this.relatedId = relatedId;
-    this.id=id;
-    this.latitude=latitude;
-    this.longitude=longitude;
-    this.address=address;
-    this.country=country;
-    this.county=county;
-    this.town=town;
-    this.relatedType=relatedType;
+    this.id = id;
+    this.latitude = latitude;
+    this.longitude = longitude;
+    this.address = address;
+    this.country = country;
+    this.county = county;
+    this.town = town;
+    this.relatedType = relatedType;
   }
 
-
-  
-// Tengo que comprobar que exista en la tabla que le tengo que pasar de relatedType y el id 
+  // Tengo que comprobar que exista en la tabla que le tengo que pasar de relatedType y el id
   async existLocation(): Promise<number> {
     const queryExist = existLocation();
 
@@ -44,9 +46,11 @@ class Location implements LocationInterface{
     const [rows]: [any[], any] = await promisePool.query(queryExist, [
       this.relatedId,
     ]);
-    console.log(rows)
+    console.log(rows);
     if (rows.length > 0) {
-      throw new Error('Ya existe esa localizacion asociada a un elemento en nuestra bbdd');
+      throw new Error(
+        'Ya existe esa localizacion asociada a un elemento en nuestra bbdd',
+      );
     }
 
     return rows.length;
@@ -65,7 +69,7 @@ class Location implements LocationInterface{
       this.longitude,
       this.town,
       this.country,
-      this.county
+      this.county,
     ]);
 
     if (result.affectedRows === 0) {
@@ -74,8 +78,6 @@ class Location implements LocationInterface{
 
     return result.affectedRows;
   }
-
- 
 }
 
-export {Location };
+export { Location };

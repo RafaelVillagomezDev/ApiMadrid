@@ -11,52 +11,47 @@ const ImageController = {
   createImage: async (
     req: Request,
     res: Response<ApiResponseInterface>,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> => {
     try {
-     
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-         res.status(400).json({
+        res.status(400).json({
           message: 'Error en la validación de los datos.',
           data: errors.array(),
           code: 400,
         });
-        return
+        return;
       }
 
       // Extraer los datos validados
       const validData = matchedData(req);
       const { relatedId, relatedType } = validData;
 
-      const urls = []
-      let files: any
-      files = req.files
+      const urls = [];
+      let files: any;
+      files = req.files;
 
       for (const file of files) {
-          
-
-          const newPath = await uploadImagesToCloudinary(file)
-          urls.push(newPath)
+        const newPath = await uploadImagesToCloudinary(file);
+        urls.push(newPath);
       }
 
-      const multiImage = urls.map((url: any) => url)  
-      
+      const multiImage = urls.map((url: any) => url);
+
       const image: ImageInterface = {
         id: await uuidv4(),
         relatedId: relatedId,
         relatedType: relatedType,
         url: multiImage,
-      }
+      };
 
       await ImageFactory.createImage(image);
-   
+
       res.status(200).json({
         message: 'Imagen creada con éxito',
-        code: 200
-      }
-        
-      )
+        code: 200,
+      });
     } catch (error) {
       next(error);
     }

@@ -30,9 +30,6 @@ const RestaurantSchema = {
         },
         errorMessage: 'El nombre es obligatorio', // Este mensaje será lanzado si no existe el valor
       },
-      optional: {
-        options: { nullable: true }, // No ejecuta las validaciones si el campo es falsy (vacío, null, etc.)
-      },
       isLength: {
         options: { max: 30 },
         errorMessage: 'El nombre debe tener máximo 30 caracteres',
@@ -53,9 +50,6 @@ const RestaurantSchema = {
         },
         errorMessage: 'El email es obligatorio', // Este mensaje será lanzado si no existe el valor
       },
-      optional: {
-        options: { nullable: true }, // No ejecuta las validaciones si el campo es falsy (vacío, null, etc.)
-      },
       isLength: {
         options: { max: 50 },
         errorMessage: 'El email debe tener máximo 50 caracteres',
@@ -68,6 +62,7 @@ const RestaurantSchema = {
       },
     },
     description: {
+      in: ['body'],
       trim: true,
       notEmpty: {
         errorMessage: 'La descripción no puede estar vacía',
@@ -80,7 +75,7 @@ const RestaurantSchema = {
         options: /^[a-zA-Z0-9\s.,!?"'-]+$/,
         errorMessage: 'La descripción contiene caracteres no permitidos',
       },
-    }
+    },
   }),
 };
 

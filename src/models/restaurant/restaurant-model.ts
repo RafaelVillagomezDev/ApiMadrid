@@ -16,13 +16,12 @@ class Restaurant implements RestaurantInterface {
   address: string;
   description: Text;
 
-  constructor({ id, email, name, address,description }: RestaurantInterface) {
+  constructor({ id, email, name, address, description }: RestaurantInterface) {
     this.id = id;
     this.email = email;
-    this.name = name; 
+    this.name = name;
     this.address = address;
-    this.description=description;
-
+    this.description = description;
   }
 
   async createRestaurant(): Promise<number> {
@@ -34,7 +33,7 @@ class Restaurant implements RestaurantInterface {
       this.email,
       this.name,
       this.address,
-      this.description
+      this.description,
     ]);
 
     if (result.affectedRows === 0) {

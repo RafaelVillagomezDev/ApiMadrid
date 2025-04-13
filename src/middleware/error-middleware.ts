@@ -1,27 +1,27 @@
+import logger from '../utils/logger';
 import { Request, Response, NextFunction } from 'express';
 
-interface ApiError extends Error {
-  status?: number;
-}
-
-// Middleware de manejo de errores
-const errorHandler = (
-  err: ApiError,
+export const errorLogger = (
+  err: unknown,
   req: Request,
   res: Response,
-  next: NextFunction, //Es necesario para que Express sepa que es un manejador de Errores
+  next: NextFunction
 ): void => {
-  console.error('Error en la aplicación:', err);
+  const error = err instanceof Error ? err : new Error(String(err));
 
-  const status = err.status || 500;
+  const logData = {
+    method: req.method,
+    url: req.originalUrl,
+    status: res.statusCode,
+    ip: req.ip || req.connection.remoteAddress,
+    headers: req.headers,
+    userAgent: req.headers['user-agent'],
+    message: error.message,
+    stack: error.stack,
+  };
 
-  const message = err.message || 'Error interno del servidor';
+  
+  logger.error(`${req.method} ${req.originalUrl} - ERROR`, logData);
 
-  res.status(status).send({
-    success: false,
-    message: message,
-    code: status,
-  });
+  next(error); 
 };
-
-export { errorHandler };

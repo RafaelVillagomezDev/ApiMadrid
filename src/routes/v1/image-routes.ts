@@ -8,7 +8,7 @@ const router: Router = express.Router();
 router.post(
   '/create/:relatedType/:relatedId',
   ImageSchema.create,
-  upload.array("images"),
+  upload.array('images'),
   ImageController.createImage,
 );
 

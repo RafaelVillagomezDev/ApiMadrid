@@ -20,31 +20,31 @@ class Image implements ImageInterface {
   }
 
   async createImage(): Promise<number> {
-    const connection = await promisePool.getConnection(); 
-    await connection.beginTransaction(); 
-  
+    const connection = await promisePool.getConnection();
+    await connection.beginTransaction();
+
     try {
-      const queryCreate = createImage(); 
-  
+      const queryCreate = createImage();
+
       const [result] = await connection.query<ResultSetHeader>(queryCreate, [
         this.id,
         this.relatedId,
         this.relatedType,
-        JSON.stringify(this.url), 
+        JSON.stringify(this.url),
       ]);
-  
+
       if (result.affectedRows === 0) {
         throw new Error('No se pudo crear la imagen');
       }
-  
-      await connection.commit(); 
-      connection.release(); 
-  
+
+      await connection.commit();
+      connection.release();
+
       return result.affectedRows;
     } catch (error) {
-      await connection.rollback(); 
-      connection.release(); 
-      throw error; 
+      await connection.rollback();
+      connection.release();
+      throw error;
     }
   }
 

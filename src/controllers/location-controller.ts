@@ -4,11 +4,8 @@ import { matchedData, validationResult } from 'express-validator';
 import { LocationInterface } from 'location-type';
 import { LocationFactory } from '../factory/location-factory';
 
-
 import { v4 as uuidv4 } from 'uuid';
 import { getCoords } from '../utils/geodata';
-
-
 
 const LocationController = {
   createLocation: async (
@@ -31,24 +28,20 @@ const LocationController = {
 
       const validData = matchedData(req);
 
-      const geoData=await getCoords(validData.address);
-
+      const geoData = await getCoords(validData.address);
 
       const location: LocationInterface = {
         relatedId: validData.relatedId,
         id: await uuidv4(),
-        relatedType:validData.relatedType,
+        relatedType: validData.relatedType,
         address: validData.address,
-        latitude:geoData.latitud,
-        longitude:geoData.longitud,
-        country:geoData.country,
-        town:geoData.town,
-        county:geoData.county
+        latitude: geoData.latitud,
+        longitude: geoData.longitud,
+        country: geoData.country,
+        town: geoData.town,
+        county: geoData.county,
       };
 
-    
-      
-      
       await LocationFactory.createLocation(location);
 
       const response: ApiResponseInterface = {
@@ -57,7 +50,6 @@ const LocationController = {
       };
 
       res.status(200).send(response);
-
     } catch (error) {
       next(error);
     }

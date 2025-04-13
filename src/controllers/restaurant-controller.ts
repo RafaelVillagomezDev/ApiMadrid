@@ -31,7 +31,7 @@ const RestaurantController = {
         email: validData.email,
         name: validData.name,
         address: validData.address,
-        description:validData.description
+        description: validData.description,
       };
 
       await RestaurantFactory.createRestaurant(restaurant);

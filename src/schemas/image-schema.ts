@@ -1,12 +1,11 @@
 import { checkSchema } from 'express-validator';
 
-const validateRelatedType = (value:string) => {
+const validateRelatedType = (value: string) => {
   if (value !== 'restaurant') {
     throw new Error('El relatedType solo puede ser "restaurant"');
   }
   return true;
 };
-
 
 const ImageSchema = {
   create: checkSchema({
@@ -22,20 +21,20 @@ const ImageSchema = {
       escape: true,
       exists: {
         options: {
-          checkNull: true, 
-          checkFalsy: true, 
+          checkNull: true,
+          checkFalsy: true,
         },
-        errorMessage: 'El tipo relacionado es  obligatorio', 
+        errorMessage: 'El tipo relacionado es  obligatorio',
       },
       optional: {
-        options: { nullable: true }, 
+        options: { nullable: true },
       },
       isLength: {
         options: { max: 30 },
         errorMessage: 'El nombre debe tener máximo 30 caracteres',
       },
       custom: {
-        options: validateRelatedType
+        options: validateRelatedType,
       },
     },
   }),

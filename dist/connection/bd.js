@@ -5,10 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pool = void 0;
 const mysql2_1 = __importDefault(require("mysql2"));
-console.log(process.env.DBHOST);
+const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
+dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../../.env') });
 if (!process.env.DBHOST ||
     !process.env.DBUSER ||
-    !process.env.DBPASSSWORD ||
+    !process.env.DBPASSWORD ||
     !process.env.DBDATABASE ||
     !process.env.DBPORT) {
     throw new Error('Variables de entorno vacias');
@@ -16,7 +18,7 @@ if (!process.env.DBHOST ||
 const connection = {
     host: process.env.DBHOST,
     user: process.env.DBUSER,
-    password: process.env.DBPASSSWORD,
+    password: process.env.DBPASSWORD,
     database: process.env.DBDATABASE,
     port: process.env.DBPORT ? parseInt(process.env.DBPORT, 10) : 3306,
     connectionLimit: 10,

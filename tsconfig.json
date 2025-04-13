@@ -14,8 +14,8 @@
   },
 
   "include": [
-    "src/**/*.ts",    // Incluye todos los archivos .ts en src
-    "src/**/*.tsx",   // Incluye todos los archivos .tsx en src
+    "src/**/*.ts", // Incluye todos los archivos .ts en src
+    "src/**/*.tsx", // Incluye todos los archivos .tsx en src
     "express.d.ts"
   ],
   "exclude": [

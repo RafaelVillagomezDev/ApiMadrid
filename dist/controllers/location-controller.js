@@ -10,10 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_validator_1 = require("express-validator");
-const restaurant_factory_1 = require("../factory/restaurant-factory");
+const location_factory_1 = require("../factory/location-factory");
 const uuid_1 = require("uuid");
-const RestaurantController = {
-    createRestaurant: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const geodata_1 = require("../utils/geodata");
+const LocationController = {
+    createLocation: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const errors = (0, express_validator_1.validationResult)(req);
             const errorResponse = {
@@ -26,16 +27,21 @@ const RestaurantController = {
                 return;
             }
             const validData = (0, express_validator_1.matchedData)(req);
-            const restaurant = {
+            const geoData = yield (0, geodata_1.getCoords)(validData.address);
+            const location = {
+                relatedId: validData.relatedId,
                 id: yield (0, uuid_1.v4)(),
-                email: validData.email,
-                name: validData.name,
+                relatedType: validData.relatedType,
                 address: validData.address,
-                description: validData.description,
+                latitude: geoData.latitud,
+                longitude: geoData.longitud,
+                country: geoData.country,
+                town: geoData.town,
+                county: geoData.county,
             };
-            yield restaurant_factory_1.RestaurantFactory.createRestaurant(restaurant);
+            yield location_factory_1.LocationFactory.createLocation(location);
             const response = {
-                message: 'Restaurante creado con éxito',
+                message: 'Localización creada con éxito',
                 code: 200,
             };
             res.status(200).send(response);
@@ -45,4 +51,4 @@ const RestaurantController = {
         }
     }),
 };
-exports.default = RestaurantController;
+exports.default = LocationController;
