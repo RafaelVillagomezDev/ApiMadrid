@@ -2,19 +2,19 @@ import { RestaurantInterface } from 'restaurant-type';
 import {
   createRestaurant,
   existRestaurant,
+  getRestaurantData,
 } from '../../queries/restaurant-query';
 import { pool } from '../../connection/bd';
 import { ResultSetHeader } from 'mysql2';
 
-// Obtener el pool de promesas
 const promisePool = pool.promise();
 
 class Restaurant implements RestaurantInterface {
-  id: string;
-  email: string;
-  name: string;
-  address: string;
-  description: Text;
+  id?: string;
+  email?: string;
+  name?: string;
+  address?: string;
+  description?: Text;
 
   constructor({ id, email, name, address, description }: RestaurantInterface) {
     this.id = id;
@@ -26,8 +26,6 @@ class Restaurant implements RestaurantInterface {
 
   async createRestaurant(): Promise<number> {
     const queryCreate = createRestaurant();
-
-    // Ejecutar la consulta usando el pool de promesas
     const [result] = await promisePool.query<ResultSetHeader>(queryCreate, [
       this.id,
       this.email,
@@ -37,7 +35,7 @@ class Restaurant implements RestaurantInterface {
     ]);
 
     if (result.affectedRows === 0) {
-      throw new Error('No se pudo crear el restaurante ');
+      throw new Error('No se pudo crear el restaurante');
     }
 
     return result.affectedRows;
@@ -45,8 +43,6 @@ class Restaurant implements RestaurantInterface {
 
   async existRestaurant(): Promise<number> {
     const queryExist = existRestaurant();
-
-    // Ejecutar la consulta usando el pool de promesas
     const [rows]: [any[], any] = await promisePool.query(queryExist, [
       this.email,
     ]);
@@ -56,6 +52,21 @@ class Restaurant implements RestaurantInterface {
     }
 
     return rows.length;
+  }
+
+  async getRestaurants() {
+    const [queryRestaurants, values] = getRestaurantData({
+      name: this.name,
+      address: this.address,
+    });
+
+    const [rows]: [any[], any] = await promisePool.query(queryRestaurants,values);
+
+    if (rows.length === 0) {
+      throw new Error('No existen restaurantes con esas condiciones');
+    }
+
+    return rows;
   }
 }
 

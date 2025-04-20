@@ -1,4 +1,4 @@
-import { RestaurantInterface } from 'restaurant-type';
+import { RestaurantInterface, RestaurantQueryInterface } from 'restaurant-type';
 import { Restaurant } from '../models/restaurant/restaurant-model';
 
 class RestaurantFactory {
@@ -8,5 +8,12 @@ class RestaurantFactory {
     const rows = await restaurant.createRestaurant();
     return rows;
   }
+
+  static async getRestaurant(obj:RestaurantInterface){
+    const restaurant = new Restaurant(obj);
+    const data= await restaurant.getRestaurants();
+    return data;
+  }
+
 }
 export { RestaurantFactory };
