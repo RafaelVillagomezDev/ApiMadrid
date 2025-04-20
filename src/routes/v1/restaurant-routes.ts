@@ -11,4 +11,10 @@ router.post(
   RestaurantController.createRestaurant,
 );
 
+router.get(
+  '',RestaurantSchema.get,
+  RestaurantController.getRestaurants
+
+)
+
 export default router;

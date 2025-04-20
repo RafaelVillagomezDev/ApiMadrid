@@ -77,6 +77,39 @@ const RestaurantSchema = {
       },
     },
   }),
+  get: checkSchema({
+    name: {
+      in: ["query"],
+      optional: true,
+      errorMessage: 'Nombre inválido',
+      isLength: {
+        options: { max: 30 },
+        errorMessage: 'El nombre debe tener máximo 30 caracteres',
+      },
+      matches: {
+        options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{4,}$/,
+        errorMessage:
+          'El nombre debe tener al menos 4 caracteres alfanuméricos',
+      }
+    },
+    address: {
+      in: ["query"],
+      optional: true,
+      errorMessage: 'Dirección inválida',
+      trim: true,
+      escape: true,
+      isLength: {
+        options: { max: 50 },
+        errorMessage: 'La dirección debe tener máximo 50 caracteres',
+      },
+      matches: {
+        options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{4,}$/,
+        errorMessage:
+          'La dirección debe tener al menos 4 caracteres alfanuméricos',
+      }
+    }
+  })
+  
 };
 
 export { RestaurantSchema };

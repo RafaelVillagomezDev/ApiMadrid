@@ -14,7 +14,8 @@ CREATE TABLE RESTAURANT (
     name VARCHAR(50),
     email VARCHAR(50) UNIQUE,
     address VARCHAR(100),
-    description TEXT
+    description TEXT,
+    CONSTRAINT unique_name_address UNIQUE (name, address)
 );
 
 CREATE TABLE USERS (

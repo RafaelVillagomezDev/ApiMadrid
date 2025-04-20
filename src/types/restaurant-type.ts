@@ -1,9 +1,9 @@
 interface RestaurantInterface {
-  id: string;
-  name: string;
-  address: string;
-  email: string;
-  description: Text;
+  id?: string;
+  name?: string;
+  address?: string;
+  email?: string;
+  description?: Text;
   [key: string]: any;
 }
 
@@ -12,4 +12,9 @@ interface RestaurantInterface {
  * puede tener cualquier clave de tipo string con valores de cualquier tipo (unknown),
  * mientras que RestaurantInterface tiene claves específicas y no acepta claves arbitrarias.
  */
-export { RestaurantInterface };
+
+interface RestaurantQueryInterface{
+  name?:string,
+  address?:string
+}
+export { RestaurantInterface , RestaurantQueryInterface };
