@@ -1,9 +1,11 @@
 import { ApiResponseInterface } from 'api-type';
 import { Request, Response, NextFunction } from 'express';
 import { matchedData, validationResult } from 'express-validator';
-import { RestaurantInterface, RestaurantQueryInterface } from 'restaurant-type';
+import { RestaurantInterface, RestaurantQueryInterface, RestaurantQueryPagination } from 'restaurant-type';
 import { RestaurantFactory } from '../factory/restaurant-factory';
 import { v4 as uuidv4 } from 'uuid';
+import { Restaurant } from '../models/restaurant/restaurant-model';
+
 
 const RestaurantController = {
   createRestaurant: async (
@@ -66,16 +68,17 @@ const RestaurantController = {
 
       const validData = matchedData(req);
 
-      const query:RestaurantQueryInterface={
+      const query:RestaurantQueryPagination={
           name:validData.name,
-          address:validData.address
-
+          address:validData.address,
+          limit:validData.limit,
+          offset:validData.offset
       }
 
-     const data=await RestaurantFactory.getRestaurant(query)
+     const data=await Restaurant.getRestaurants(query)
 
      const response: ApiResponseInterface = {
-      message: 'Restaurante creado con éxito',
+      message: 'Restaurante obtenidos con éxito',
       data:data,
       code: 200,
       count:data.length

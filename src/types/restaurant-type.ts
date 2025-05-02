@@ -15,6 +15,13 @@ interface RestaurantInterface {
 
 interface RestaurantQueryInterface{
   name?:string,
-  address?:string
+  address?:string,
 }
-export { RestaurantInterface , RestaurantQueryInterface };
+
+interface RestaurantQueryPagination{
+  name?:string,
+  address?:string,
+  limit?:number,
+  offset?:number
+}
+export { RestaurantInterface , RestaurantQueryInterface,RestaurantQueryPagination };

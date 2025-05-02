@@ -1,4 +1,4 @@
-import { RestaurantQueryInterface } from "restaurant-type";
+import { RestaurantQueryInterface, RestaurantQueryPagination } from "restaurant-type";
 
 const createRestaurant = (): string => {
   const query = `INSERT IGNORE INTO RESTAURANT (id,email,name,address,description) VALUES (?, ?, ?, ?,?);`;
@@ -14,18 +14,37 @@ const isRestaurant = (): string => {
   return query;
 };
 
-const getRestaurantData = ({ name, address }: RestaurantQueryInterface): [string, any[]] => {
-  let query = `SELECT * FROM restaurant`;
+const getRestaurantData = ({ name, address, limit = 20, offset = 0 }: RestaurantQueryPagination): [string, any[]] => {
+  let query = `
+    SELECT 
+      restaurant.id AS restaurant_id,
+      restaurant.name AS restaurant_name,
+      restaurant.email AS restaurant_email,
+      restaurant.address AS restaurant_address,
+      restaurant.description AS restaurant_description,
+      images.id AS image_id,
+      images.url AS image_url,
+      location.id AS location_id,
+      location.address AS location_address,
+      location.latitude AS location_latitude,
+      location.longitude AS location_longitude,
+      location.country AS location_country,
+      location.county AS location_county
+    FROM restaurant
+    LEFT JOIN images ON restaurant.id = images.relatedId
+    LEFT JOIN location ON restaurant.id = location.relatedId
+  `;
+
   const conditions: string[] = [];
   const values: any[] = [];
 
   if (name) {
-    conditions.push(`name LIKE ?`);
+    conditions.push(`restaurant.name LIKE ?`);
     values.push(`%${name}%`);
   }
 
   if (address) {
-    conditions.push(`address LIKE ?`);
+    conditions.push(`restaurant.address LIKE ?`);
     values.push(`%${address}%`);
   }
 
@@ -33,7 +52,13 @@ const getRestaurantData = ({ name, address }: RestaurantQueryInterface): [string
     query += ` WHERE ` + conditions.join(' AND ');
   }
 
-  return [query, values];
+  // Añadir LIMIT y OFFSET
+  query += ` ORDER BY restaurant.id LIMIT ? OFFSET ?`;
+  values.push(Number(limit), Number(offset));
+
+  return [query.trim(), values];
 };
+
+
 
 export { createRestaurant, existRestaurant, isRestaurant,getRestaurantData };
