@@ -1,4 +1,4 @@
-import { RestaurantInterface } from 'restaurant-type';
+import { RestaurantInterface, RestaurantQueryPagination } from 'restaurant-type';
 import {
   createRestaurant,
   existRestaurant,
@@ -24,7 +24,7 @@ class Restaurant implements RestaurantInterface {
     this.description = description;
   }
 
-  async createRestaurant(): Promise<number> {
+   async createRestaurant():Promise<number> {
     const queryCreate = createRestaurant();
     const [result] = await promisePool.query<ResultSetHeader>(queryCreate, [
       this.id,
@@ -54,12 +54,16 @@ class Restaurant implements RestaurantInterface {
     return rows.length;
   }
 
-  async getRestaurants() {
+  static async getRestaurants(obj:RestaurantQueryPagination) {
+    const {name,address,limit,offset}=obj;
     const [queryRestaurants, values] = getRestaurantData({
-      name: this.name,
-      address: this.address,
+       name,
+       address,
+       limit,
+       offset
     });
 
+    console.log()
     const [rows]: [any[], any] = await promisePool.query(queryRestaurants,values);
 
     if (rows.length === 0) {

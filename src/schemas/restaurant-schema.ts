@@ -107,7 +107,35 @@ const RestaurantSchema = {
         errorMessage:
           'La dirección debe tener al menos 4 caracteres alfanuméricos',
       }
-    }
+    },
+    limit:{
+      in: ["query"],
+      optional: true,
+      errorMessage: 'Limite invalido',
+      trim: true,
+      escape: true,
+      isLength: {
+        options: { max: 2 },
+        errorMessage: 'El limite debe tener como maximo 2 cifras',
+      },
+      isInt:{
+        errorMessage:"El limite es invalido debe ser un entero"
+      }
+    },
+    offset:{
+      in: ["query"],
+      optional: true,
+      errorMessage: 'Paginación invalida',
+      trim: true,
+      escape: true,
+      isLength: {
+        options: { max: 2 },
+        errorMessage: 'La paginación debe tener como maximo 2 cifras',
+      },
+      isInt:{
+        errorMessage:"La paginación es invalida debe ser un entero"
+      }
+    },
   })
   
 };
