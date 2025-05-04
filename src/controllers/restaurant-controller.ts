@@ -34,6 +34,9 @@ const RestaurantController = {
         name: validData.name,
         address: validData.address,
         description: validData.description,
+        phone:validData.phone,
+        type_food:validData.type_food,
+        web:validData.web
       };
 
       await RestaurantFactory.createRestaurant(restaurant);

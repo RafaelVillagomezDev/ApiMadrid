@@ -4,6 +4,9 @@ interface RestaurantInterface {
   address?: string;
   email?: string;
   description?: Text;
+  phone:string,
+  type_food:string,
+  web:string
   [key: string]: any;
 }
 
