@@ -1,7 +1,7 @@
-import { RestaurantQueryInterface, RestaurantQueryPagination } from "restaurant-type";
+import { RestaurantQueryPagination } from "restaurant-type";
 
 const createRestaurant = (): string => {
-  const query = `INSERT IGNORE INTO RESTAURANT (id,email,name,address,description) VALUES (?, ?, ?, ?,?);`;
+  const query = `INSERT IGNORE INTO RESTAURANT (id,email,name,address,description,phone,type_food,web) VALUES (?, ?, ?, ?,?,?,?,?);`;
   return query;
 };
 
@@ -22,6 +22,9 @@ const getRestaurantData = ({ name, address, limit = 20, offset = 0 }: Restaurant
       restaurant.email AS restaurant_email,
       restaurant.address AS restaurant_address,
       restaurant.description AS restaurant_description,
+      restaurant.phone AS restaurant_phone,
+      restaurant.type_food AS restaurant_type_food,
+      restaurant.web AS restaurant_web,
       images.id AS image_id,
       images.url AS image_url,
       location.id AS location_id,

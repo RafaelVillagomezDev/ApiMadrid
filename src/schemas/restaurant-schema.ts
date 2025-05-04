@@ -64,6 +64,7 @@ const RestaurantSchema = {
     description: {
       in: ['body'],
       trim: true,
+      escape:true,
       notEmpty: {
         errorMessage: 'La descripción no puede estar vacía',
       },
@@ -76,6 +77,53 @@ const RestaurantSchema = {
         errorMessage: 'La descripción contiene caracteres no permitidos',
       },
     },
+    phone: {
+      in: ['body'],
+      trim: true,
+      escape:true,
+      notEmpty: {
+        errorMessage: 'El teléfono no puede estar vacío',
+      },
+      isLength: {
+        options: { min: 7, max: 16 },
+        errorMessage: 'El teléfono debe tener entre 7 y 16 caracteres',
+      },
+      matches: {
+        options: /^(\+?\d{1,4}|00\d{1,4})?\d{6,12}$/,
+        errorMessage: 'El teléfono contiene un formato inválido (solo números, sin espacios)',
+      },
+    },
+    type_food: {
+      in: ['body'],
+      trim: true,
+      escape: true,
+      notEmpty: {
+        errorMessage: 'El tipo de comida no puede estar vacío',
+      },
+      isLength: {
+        options: { min: 3, max: 25 },
+        errorMessage: 'El tipo de comida debe tener entre 3 y 25 caracteres',
+      },
+      matches: {
+        // Acepta solo letras (mayúsculas, minúsculas) y espacios
+        options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
+        errorMessage: 'El tipo de comida solo debe contener letras',
+      },
+    },
+    web: {
+      in: ['body'],
+      trim: true,
+      isLength: {
+        options: { min: 10, max: 250 },
+        errorMessage: 'La web debe tener entre 10 y 250 caracteres',
+      },
+      matches: {
+        options: /^(https?:\/\/)?(www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/\S*)?$/,
+        errorMessage: 'La web debe ser una URL válida (ej. https://ejemplo.com)',
+      },
+    }
+    
+    
   }),
   get: checkSchema({
     name: {
