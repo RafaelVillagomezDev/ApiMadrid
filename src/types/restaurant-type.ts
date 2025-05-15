@@ -22,6 +22,7 @@ interface RestaurantQueryInterface{
 }
 
 interface RestaurantQueryPagination{
+  id?:string,
   name?:string,
   address?:string,
   limit?:number,

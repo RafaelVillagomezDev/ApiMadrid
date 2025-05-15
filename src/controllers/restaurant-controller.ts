@@ -73,6 +73,7 @@ const RestaurantController = {
 
       const query:RestaurantQueryPagination={
           name:validData.name,
+          id:validData.id,
           address:validData.address,
           limit:validData.limit,
           offset:validData.offset
