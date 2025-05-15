@@ -14,7 +14,7 @@ const isRestaurant = (): string => {
   return query;
 };
 
-const getRestaurantData = ({ name, address, limit = 20, offset = 0 }: RestaurantQueryPagination): [string, any[]] => {
+const getRestaurantData = ({ id, name, address, limit = 20, offset = 0 }: RestaurantQueryPagination): [string, any[]] => {
   let query = `
     SELECT 
       restaurant.id AS restaurant_id,
@@ -41,6 +41,11 @@ const getRestaurantData = ({ name, address, limit = 20, offset = 0 }: Restaurant
   const conditions: string[] = [];
   const values: any[] = [];
 
+  if (id) {
+    conditions.push(`restaurant.id = ?`);
+    values.push(id);
+  }
+
   if (name) {
     conditions.push(`restaurant.name LIKE ?`);
     values.push(`%${name}%`);
@@ -55,12 +60,12 @@ const getRestaurantData = ({ name, address, limit = 20, offset = 0 }: Restaurant
     query += ` WHERE ` + conditions.join(' AND ');
   }
 
-  // Añadir LIMIT y OFFSET
   query += ` ORDER BY restaurant.id LIMIT ? OFFSET ?`;
   values.push(Number(limit), Number(offset));
 
   return [query.trim(), values];
 };
+
 
 
 

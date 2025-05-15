@@ -64,8 +64,9 @@ class Restaurant implements RestaurantInterface {
   }
 
   static async getRestaurants(obj:RestaurantQueryPagination) {
-    const {name,address,limit,offset}=obj;
+    const {id,name,address,limit,offset}=obj;
     const [queryRestaurants, values] = getRestaurantData({
+       id,
        name,
        address,
        limit,
