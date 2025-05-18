@@ -23,17 +23,24 @@ CREATE TABLE RESTAURANT (
     INDEX idx_name_address (name, address)
 );
 
--- 2. Tablas con claves foráneas a las anteriores
+
 CREATE TABLE MENU (
     id CHAR(36) PRIMARY KEY,
     restaurant_id CHAR(36),
-    dish_name VARCHAR(100),
+    name VARCHAR(100), -- ejemplo: "Menú del día"
     description TEXT,
-    price DECIMAL(6,2),
-    category VARCHAR(50), 
     FOREIGN KEY (restaurant_id) REFERENCES RESTAURANT(id) ON DELETE CASCADE
 );
 
+CREATE TABLE DISHES (
+    id CHAR(36) PRIMARY KEY,
+    menu_id CHAR(36),
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(6,2),
+    category VARCHAR(50),
+    FOREIGN KEY (menu_id) REFERENCES MENU(id) ON DELETE CASCADE
+);
 CREATE TABLE REFRESH_TOKENS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(255) NOT NULL,

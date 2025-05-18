@@ -1,12 +1,16 @@
+interface DishInterface {
+  name: string;
+  description?: string;
+  price: number;
+  category: string;
+}
+
 interface MenuInterface {
-    id?: string;
-    restaurant_id?: string;
-    dish_name?: string;
-    description?: string;
-    price?:number;
-    category?:string;
-    [key: string]: any;
-  }
-  
-  export { MenuInterface };
-  
+  id: string;
+  restaurant_id: string;
+  name: string;
+  description?: string;
+  dishes: DishInterface[];
+}
+
+export { MenuInterface ,DishInterface};

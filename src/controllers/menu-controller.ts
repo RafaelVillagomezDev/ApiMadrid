@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { MenuInterface } from 'menu-types';
 import { MenuFactory } from '../factory/menu-factory';
 
-
 const MenuController = {
   createMenu: async (
     req: Request,
@@ -14,42 +13,41 @@ const MenuController = {
   ): Promise<void> => {
     try {
       const errors = validationResult(req);
-      const errorResponse: ApiResponseInterface = {
-        message: 'Error en validación',
-        data: errors.array(),
-        code: 400,
-      };
 
       if (!errors.isEmpty()) {
+        const errorResponse: ApiResponseInterface = {
+          message: 'Error en validación',
+          data: errors.array(),
+          code: 400,
+        };
         res.status(400).json(errorResponse);
         return;
       }
 
-      const validData = matchedData(req);
+      
+      const validData = matchedData(req, { locations: ['body'] });
 
+  
       const menu: MenuInterface = {
-        id: await uuidv4(),
+        id: uuidv4(), 
         restaurant_id: validData.restaurant_id,
-        dish_name:validData.dish_name,
-        description:validData.description,
-        price:validData.price,
-        category:validData.category
+        name: validData.name,
+        description: validData.description,
+        dishes: validData.dishes, 
       };
 
       await MenuFactory.createMenu(menu);
 
       const response: ApiResponseInterface = {
-        message: 'Menu creado con éxito',
+        message: 'Menú creado con éxito',
         code: 200,
       };
 
-      res.status(200).send(response);
+      res.status(200).json(response);
     } catch (error) {
       next(error);
     }
   },
-  
 };
 
 export default MenuController;
-
