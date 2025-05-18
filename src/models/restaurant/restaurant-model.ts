@@ -2,6 +2,7 @@ import { RestaurantInterface, RestaurantQueryPagination } from 'restaurant-type'
 import {
   createRestaurant,
   existRestaurant,
+  formatRestaurantData,
   getRestaurantData,
 } from '../../queries/restaurant-query';
 import { pool } from '../../connection/bd';
@@ -73,14 +74,14 @@ class Restaurant implements RestaurantInterface {
        offset
     });
 
-    console.log()
+    
     const [rows]: [any[], any] = await promisePool.query(queryRestaurants,values);
 
     if (rows.length === 0) {
       throw new Error('No existen restaurantes con esas condiciones');
     }
 
-    return rows;
+    return formatRestaurantData(rows);
   }
 }
 

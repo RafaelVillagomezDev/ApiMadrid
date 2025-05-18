@@ -1,55 +1,64 @@
-import { createMenu } from '../../queries/menu-query';
+import { createDishes, createMenu } from '../../queries/menu-query';
 import { pool } from '../../connection/bd';
-import { MenuInterface } from 'menu-types';
+import { DishInterface, MenuInterface } from 'menu-types';
 import { ResultSetHeader } from 'mysql2';
-
-const promisePool = pool.promise();
+import { v4 as uuidv4 } from 'uuid';
 
 class Menu implements MenuInterface {
-  id?: string;
-  restaurant_id?: string;
-  dish_name?: string;
-  description?: string; 
-  price?: number;
-  category?: string;
+  id: string;
+  restaurant_id: string;
+  name: string;
+  description?: string;
+  dishes: DishInterface[];
 
-  constructor({
-    id,
-    restaurant_id,
-    dish_name,
-    description,
-    price,
-    category
-  }: MenuInterface) {
-   
-    this.id = id;
+  constructor({ id, restaurant_id, name, description, dishes }: MenuInterface) {
+    this.id = id 
     this.restaurant_id = restaurant_id;
-    this.dish_name = dish_name;
+    this.name = name;
     this.description = description;
-    this.price = price;
-    this.category = category;
+    this.dishes = dishes || [];
   }
 
   async createMenu(): Promise<number> {
+    const conn = await pool.promise().getConnection();
     try {
-      const queryCreate = createMenu();
-      const [result] = await promisePool.query<ResultSetHeader>(queryCreate, [
+      await conn.beginTransaction();
+
+      const queryCreateMenu = createMenu();
+      const [menuResult] = await conn.query<ResultSetHeader>(queryCreateMenu, [
         this.id,
         this.restaurant_id,
-        this.dish_name,
-        this.description,
-        this.price,
-        this.category
+        this.name,
+        this.description || null,
       ]);
 
-      if (result.affectedRows === 0) {
+      if (menuResult.affectedRows === 0) {
         throw new Error('No se pudo crear el menú');
       }
 
-      return result.affectedRows;
+      const queryCreateDish = createDishes();
+
+      for (const dish of this.dishes) {
+        const dishId = uuidv4();
+        await conn.query<ResultSetHeader>(queryCreateDish, [
+          dishId,
+          this.id,
+          dish.name,
+          dish.description || null,
+          dish.price,
+          dish.category,
+        ]);
+      }
+
+      await conn.commit();
+      return menuResult.affectedRows;
     } catch (err) {
-      console.error('Error al crear el menú:', err);
-      throw err;
+      await conn.rollback();
+    
+      throw  new Error('Error al crear el menú:');
+      
+    } finally {
+      conn.release();
     }
   }
 }
