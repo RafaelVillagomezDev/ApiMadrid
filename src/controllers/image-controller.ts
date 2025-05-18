@@ -5,7 +5,6 @@ import { ApiResponseInterface } from '../types/api-type';
 import { ImageInterface } from '../types/image-type';
 import { uploadImagesToCloudinary } from '../utils/cloudinary';
 import { ImageFactory } from '../factory/image-factory';
-import * as Multer from 'multer';
 
 const ImageController = {
   createImage: async (
@@ -14,6 +13,7 @@ const ImageController = {
     next: NextFunction,
   ): Promise<void> => {
     try {
+      // Validar entrada
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json({
@@ -24,32 +24,34 @@ const ImageController = {
         return;
       }
 
-      // Extraer los datos validados
-      const validData = matchedData(req);
-      const { relatedId, relatedType } = validData;
+      const { relatedId, relatedType } = matchedData(req);
+      const files = req.files as Express.Multer.File[];
 
-      const urls = [];
-      let files: any;
-      files = req.files;
-
-      for (const file of files) {
-        const newPath = await uploadImagesToCloudinary(file);
-        urls.push(newPath);
+      // Verificar si hay archivos
+      if (!files || files.length === 0) {
+        res.status(400).json({
+          message: 'No se han proporcionado imágenes.',
+          code: 400,
+        });
+        return;
       }
 
-      const multiImage = urls.map((url: any) => url);
+      // Subir imágenes y crear cada una individualmente
+      for (const file of files) {
+        const url = await uploadImagesToCloudinary(file);
 
-      const image: ImageInterface = {
-        id: await uuidv4(),
-        relatedId: relatedId,
-        relatedType: relatedType,
-        url: multiImage,
-      };
+        const image: ImageInterface = {
+          id: uuidv4(),
+          relatedId,
+          relatedType,
+          url,
+        };
 
-      await ImageFactory.createImage(image);
+        await ImageFactory.createImage(image);
+      }
 
       res.status(200).json({
-        message: 'Imagen creada con éxito',
+        message: 'Imágenes creadas con éxito.',
         code: 200,
       });
     } catch (error) {

@@ -10,7 +10,7 @@ class Image implements ImageInterface {
   id: string;
   relatedId: string;
   relatedType: string;
-  url: string[];
+  url: string;
 
   constructor({ id, relatedId, relatedType, url }: ImageInterface) {
     this.id = id;
@@ -30,7 +30,7 @@ class Image implements ImageInterface {
         this.id,
         this.relatedId,
         this.relatedType,
-        JSON.stringify(this.url),
+        this.url,
       ]);
 
       if (result.affectedRows === 0) {
