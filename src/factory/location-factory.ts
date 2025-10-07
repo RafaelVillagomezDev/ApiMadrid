@@ -8,5 +8,11 @@ class LocationFactory {
     const rows = await location.createLocation();
     return rows;
   }
+
+  static async getLocation(obj: LocationInterface){
+    const location = new Location(obj);
+    const rows = await location.getLocation()
+    return rows;
+  }
 }
 export { LocationFactory };

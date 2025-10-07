@@ -8,4 +8,12 @@ const createLocation = (): string => {
   return query;
 };
 
-export { existLocation, createLocation };
+const getLocation = (): string => {
+  const query = `SELECT *
+  FROM location WHERE relatedId = ? 
+   `;
+  return query;
+}
+
+
+export { existLocation, createLocation, getLocation };

@@ -54,6 +54,52 @@ const LocationController = {
       next(error);
     }
   },
+  getLocation: async (
+    req: Request,
+    res: Response<ApiResponseInterface>,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const errors = validationResult(req);
+      const errorResponse: ApiResponseInterface = {
+        message: 'Error en validación',
+        data: errors.array(),
+        code: 400,
+      };
+
+      if (!errors.isEmpty()) {
+        res.status(400).json(errorResponse);
+        return;
+      }
+
+      const validData = matchedData(req);
+
+      const location: LocationInterface = {
+        relatedId: validData.relatedId,
+        relatedType: validData.relatedType,
+        address: validData.address,
+        latitude: validData.latitud,
+        longitude: validData.longitud,
+        country: validData.country,
+        town: validData.town,
+        county: validData.county,
+      };
+
+      const data = await LocationFactory.getLocation(location);
+
+      const response: ApiResponseInterface = {
+        message: 'Restaurante obtenido con éxito',
+        data: data,
+        code: 200,
+        count: 1
+      };
+
+      res.status(200).send(response);
+
+    } catch (error) {
+      next(error);
+    }
+  }
 };
 
 export default LocationController;
