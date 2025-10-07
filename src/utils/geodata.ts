@@ -26,8 +26,6 @@ const getCoords = (address: string): Promise<GeoData> => {
           };
 
           resolve(geoData);
-        } else {
-          reject(new Error('No se encontraron coordenadas'));
         }
       })
       .catch((error) => {

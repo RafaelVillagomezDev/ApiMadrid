@@ -68,6 +68,48 @@ const LocationSchema = {
       },
     },
   }),
+  get : checkSchema({
+
+      relatedType: {
+      in: ['params'],
+      exists: {
+        options: {
+          checkNull: true,
+          checkFalsy: true,
+        },
+        errorMessage: 'El tipo relacionado es obligatorio',
+      },
+      isLength: {
+        options: { max: 30 },
+        errorMessage: 'El tipo debe tener máximo 30 caracteres',
+      },
+      custom: {
+        options: validateRelatedType,
+      },
+    },
+    relatedId: {
+      in: ['params'],
+      isUUID: {
+        errorMessage: 'Id debe ser un UUID válido',
+      },
+      custom: {
+        options: async (value) => {
+          const [rows]: [any[], any] = await promisePool.query(isRestaurant(), [
+            value,
+          ]);
+
+          if (rows.length === 0) {
+            throw new Error(
+              'No existe un restaurante con ese ID en la base de datos',
+            );
+          }
+
+          return true;
+        },
+      },
+    }
+
+  })
 };
 
 export { LocationSchema };

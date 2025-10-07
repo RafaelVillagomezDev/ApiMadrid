@@ -1,7 +1,7 @@
 interface LocationInterface {
   relatedId: string;
   relatedType: string;
-  id: string;
+  id?: string;
   latitude: string;
   longitude: string;
   address: string;

@@ -1,7 +1,7 @@
 import { LocationInterface } from 'location-type';
 import { pool } from '../../connection/bd';
 import { ResultSetHeader } from 'mysql2';
-import { existLocation, createLocation } from '../../queries/location-query';
+import { existLocation, createLocation, getLocation } from '../../queries/location-query';
 // Obtener el pool de promesas
 const promisePool = pool.promise();
 
@@ -28,7 +28,7 @@ class Location implements LocationInterface {
     relatedType,
   }: LocationInterface) {
     this.relatedId = relatedId;
-    this.id = id;
+    this.id = id??"";
     this.latitude = latitude;
     this.longitude = longitude;
     this.address = address;
@@ -77,6 +77,21 @@ class Location implements LocationInterface {
     }
 
     return result.affectedRows;
+  }
+
+  async getLocation(): Promise<any[]> {
+    const queryGet = getLocation();
+
+     const [rows]: [any[], any] = await promisePool.query(queryGet, [
+      this.relatedId,
+    ]);
+
+    if (rows.length === 0) {
+      throw new Error('No existe ese restaurante en nuestra bbdd');
+    }
+    
+
+    return rows;
   }
 }
 

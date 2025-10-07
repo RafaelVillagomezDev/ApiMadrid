@@ -10,4 +10,10 @@ router.post(
   LocationController.createLocation,
 );
 
+router.get(
+  '/:relatedType/:relatedId',
+  LocationSchema.get,
+  LocationController.getLocation,
+);
+
 export default router;
