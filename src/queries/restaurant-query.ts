@@ -153,6 +153,13 @@ const formatRestaurantData = (rows: any[]) => {
 };
 
 
+const removeRestaurantsData = (): string => {
+  const query = `DELETE FROM restaurant WHERE id = ?;`;
+  return query;
+};
 
 
-export { createRestaurant, existRestaurant, isRestaurant,getRestaurantData ,formatRestaurantData};
+
+
+
+export { createRestaurant, existRestaurant, isRestaurant,getRestaurantData ,formatRestaurantData,removeRestaurantsData};

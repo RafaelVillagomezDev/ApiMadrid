@@ -1,7 +1,7 @@
 import { ApiResponseInterface } from 'api-type';
 import { Request, Response, NextFunction } from 'express';
 import { matchedData, validationResult } from 'express-validator';
-import { RestaurantInterface, RestaurantQueryInterface, RestaurantQueryPagination } from 'restaurant-type';
+import { RestaurantInterface, RestaurantQueryInterface, RestaurantQueryPagination, RestaurantRemoveQueryInterface } from 'restaurant-type';
 import { RestaurantFactory } from '../factory/restaurant-factory';
 import { v4 as uuidv4 } from 'uuid';
 import { Restaurant } from '../models/restaurant/restaurant-model';
@@ -93,7 +93,44 @@ const RestaurantController = {
     }catch(error){
       next(error)
     }
-  }
+  },
+  removeRestaurant:async (
+    req: Request,
+    res: Response<ApiResponseInterface>,
+    next: NextFunction,
+  ): Promise<void> => {
+    try{
+      const errors = validationResult(req);
+      const errorResponse: ApiResponseInterface = {
+        message: 'Error en validación',
+        data: errors.array(),
+        code: 400,
+      };
+
+      if (!errors.isEmpty()) {
+        res.status(400).json(errorResponse);
+        return;
+      }
+
+      const validData = matchedData(req);
+
+      const restaurant: RestaurantRemoveQueryInterface={
+          id:validData.id
+      }
+
+     await RestaurantFactory.removeRestaurant(restaurant)
+
+     const response: ApiResponseInterface = {
+      message: 'Restaurante eliiminado con éxito',
+      code: 200,
+    };
+
+    res.status(200).send(response);
+
+    }catch(error){
+      next(error)
+    }
+  },
 };
 
 export default RestaurantController;
