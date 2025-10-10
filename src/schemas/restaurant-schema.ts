@@ -210,6 +210,30 @@ const RestaurantSchema = {
         errorMessage:"La paginación es invalida debe ser un entero"
       }
     },
+  }),
+  remove: checkSchema({
+    id:{
+      in: ['params'],
+      isUUID: {
+        errorMessage: 'Id debe ser un UUID válido',
+      },
+      optional: true,
+      custom: {
+        options: async (value) => {
+          const [rows]: [any[], any] = await promisePool.query(isRestaurant(), [
+            value,
+          ]);
+
+          if (rows.length === 0) {
+            throw new Error(
+              'No existe un restaurante con ese ID en la base de datos',
+            );
+          }
+
+          return true;
+        },
+      },
+    },
   })
   
 };

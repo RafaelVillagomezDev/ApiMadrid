@@ -4,6 +4,7 @@ import {
   existRestaurant,
   formatRestaurantData,
   getRestaurantData,
+  removeRestaurantsData,
 } from '../../queries/restaurant-query';
 import { pool } from '../../connection/bd';
 import { ResultSetHeader } from 'mysql2';
@@ -16,9 +17,9 @@ class Restaurant implements RestaurantInterface {
   name?: string;
   address?: string;
   description?: Text;
-  phone:string;
-  type_food:string;
-  web:string;
+  phone?:string;
+  type_food?:string;
+  web?:string;
 
   constructor({ id, email, name, address, description,phone,type_food,web }: RestaurantInterface) {
     this.id = id;
@@ -82,6 +83,21 @@ class Restaurant implements RestaurantInterface {
     }
 
     return formatRestaurantData(rows);
+  }
+
+   
+  async removeRestaurants() :Promise<number>{
+    
+    const queryRemoveRestaurants = removeRestaurantsData();
+
+    
+    const [rows]: [any[], any] = await promisePool.query(queryRemoveRestaurants,[this.id]);
+
+    if (rows.length === 0) {
+      throw new Error('No existen restaurantes con esas condiciones');
+    }
+
+    return rows.length
   }
 }
 

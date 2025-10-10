@@ -17,4 +17,10 @@ router.get(
 
 )
 
+router.post(
+  '/remove/:id',RestaurantSchema.remove,
+  RestaurantController.removeRestaurant
+
+)
+
 export default router;

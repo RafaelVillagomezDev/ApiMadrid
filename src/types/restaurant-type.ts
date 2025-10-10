@@ -4,9 +4,9 @@ interface RestaurantInterface {
   address?: string;
   email?: string;
   description?: Text;
-  phone:string,
-  type_food:string,
-  web:string
+  phone?:string,
+  type_food?:string,
+  web?:string
   [key: string]: any;
 }
 
@@ -21,6 +21,10 @@ interface RestaurantQueryInterface{
   address?:string,
 }
 
+interface RestaurantRemoveQueryInterface{
+  id:string
+}
+
 interface RestaurantQueryPagination{
   id?:string,
   name?:string,
@@ -28,4 +32,4 @@ interface RestaurantQueryPagination{
   limit?:number,
   offset?:number
 }
-export { RestaurantInterface , RestaurantQueryInterface,RestaurantQueryPagination };
+export { RestaurantInterface , RestaurantQueryInterface,RestaurantQueryPagination ,RestaurantRemoveQueryInterface};
