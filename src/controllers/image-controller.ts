@@ -3,17 +3,28 @@ import { validationResult, matchedData } from 'express-validator';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiResponseInterface } from '../types/api-type';
 import { ImageInterface } from '../types/image-type';
-import { uploadImagesToCloudinary } from '../utils/cloudinary';
 import { ImageFactory } from '../factory/image-factory';
+
+// Definición de una interfaz para los resultados de Cloudinary adjuntos por el middleware
+interface CloudinaryResult {
+  secure_url: string;
+  public_id: string; 
+  // Otros campos de Cloudinary que necesites
+}
+
+// Extender la interfaz Request para incluir los resultados procesados
+interface CustomRequest extends Request {
+  cloudinaryResults?: CloudinaryResult[];
+}
 
 const ImageController = {
   createImage: async (
-    req: Request,
+    req: CustomRequest, // Usar la interfaz extendida
     res: Response<ApiResponseInterface>,
     next: NextFunction,
   ): Promise<void> => {
     try {
-      // Validar entrada
+      // 1. Validar entrada (sin cambios, es correcto)
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json({
@@ -25,29 +36,37 @@ const ImageController = {
       }
 
       const { relatedId, relatedType } = matchedData(req);
-      const files = req.files as Express.Multer.File[];
+      
+      // 2. 🛑 CLAVE: Obtener los resultados de Cloudinary del middleware
+      const cloudinaryResults = req.cloudinaryResults;
 
-      // Verificar si hay archivos
-      if (!files || files.length === 0) {
+      // Verificar si hay resultados del procesamiento
+      if (!cloudinaryResults || cloudinaryResults.length === 0) {
+        // Asumimos que si hay archivos, el middleware de subida siempre adjunta algo.
+        // Si falla aquí, el error real debería ser capturado en el middleware anterior.
         res.status(400).json({
-          message: 'No se han proporcionado imágenes.',
+          message: 'No se encontraron resultados de imágenes procesadas.',
           code: 400,
         });
         return;
       }
 
-      // Subir imágenes y crear cada una individualmente
-      for (const file of files) {
-        const url = await uploadImagesToCloudinary(file);
+      // 3. Crear registros usando las URLs YA SUBIDAS
+      const createdImages = [];
+      for (const result of cloudinaryResults) {
+        const url = result.secure_url;
+        const publicId = result.public_id; // Útil para tener una referencia para eliminación futura
 
         const image: ImageInterface = {
           id: uuidv4(),
           relatedId,
           relatedType,
           url,
+     
         };
 
-        await ImageFactory.createImage(image);
+        const newImageRecord = await ImageFactory.createImage(image);
+        createdImages.push(newImageRecord);
       }
 
       res.status(200).json({
