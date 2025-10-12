@@ -1,31 +1,33 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-interface CloudinaryConfig {
-  cloud_name: string;
-  api_key: string;
-  api_secret: string;
-}
+// Bandera para asegurar que la configuración solo se ejecute una vez por proceso
+let isCloudinaryConfigured = false;
 
-const cloudinaryConfig: CloudinaryConfig = {
-  cloud_name: process.env.CLOUDNAME!,
-  api_key: process.env.APIKEYCLOUDINARY!,
-  api_secret: process.env.APISECRETCLOUDINARY!,
-};
+// 1. Función interna que configura Cloudinary
+const configureCloudinary = (): void => {
+    if (isCloudinaryConfigured) return;
 
-cloudinary.config(cloudinaryConfig);
+    const cloudName = process.env.CLOUDNAME;
+    const apiKey = process.env.APIKEYCLOUDINARY;
+    const apiSecret = process.env.APISECRETCLOUDINARY;
 
-const uploadImagesToCloudinary = async (file: Express.Multer.File) => {
-  return new Promise<string>((resolve, reject) => {
-    cloudinary.uploader.upload(file.path, (err, res) => {
-      if (err) {
-        reject(
-          new Error('Error uploading image to Cloudinary: ' + err.message),
+    if (!cloudName || !apiKey || !apiSecret) {
+        throw new Error(
+            "CONFIG ERROR: Falta una o más variables de entorno de Cloudinary (CLOUDNAME, APIKEYCLOUDINARY, APISECRETCLOUDINARY)."
         );
-      } else {
-        resolve(res?.secure_url || '');
-      }
+    }
+
+    cloudinary.config({
+        cloud_name: cloudName,
+        api_key: apiKey,
+        api_secret: apiSecret,
     });
-  });
+    
+    isCloudinaryConfigured = true;
+    console.log("[Cloudinary] Configuración cargada al primer uso.");
 };
 
-export { uploadImagesToCloudinary };
+
+
+
+export {configureCloudinary};
