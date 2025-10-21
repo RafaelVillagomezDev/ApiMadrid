@@ -9,6 +9,8 @@ import dotenv from 'dotenv';
 import { requestLogger } from './middleware/logger-middleware';
 import { errorLogger } from './middleware/error-middleware';
 import { errorHandler } from './middleware/error-handler';
+import { apiLimiter } from './middleware/rate-limit-middleware';
+import { csrfProtection, initCookieParser } from './auth/auth-csrf';
 
 
 
@@ -23,11 +25,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const port = 3000;
 
+
 //Logger Winstom
 app.use(requestLogger);
-
+//Cookie Parser
+app.use(initCookieParser)
+//AUTH CSRF
+app.use('/api/', csrfProtection);
+//Rate limit Middleware
+app.use('/api/', apiLimiter);
 
 //Routes
+
 app.use('/api/v1/restaurant', restaurantRoutes);
 app.use('/api/v1/image', imageRoutes);
 app.use('/api/v1/menu', menuRoutes);
