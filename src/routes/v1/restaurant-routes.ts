@@ -1,12 +1,13 @@
 import RestaurantController from '../../controllers/restaurant-controller';
 import express, { Router } from 'express';
 import { RestaurantSchema } from '../../schemas/restaurant-schema';
-import { ImageSchema } from '../../schemas/image-schema';
+
+import { verifyHmacAuthenticity } from '../../auth/auth-hmac';
 
 const router: Router = express.Router();
 
 router.post(
-  '/create',
+  '/create',verifyHmacAuthenticity,
   RestaurantSchema.create,
   RestaurantController.createRestaurant,
 );
@@ -18,7 +19,7 @@ router.get(
 )
 
 router.post(
-  '/remove/:id',RestaurantSchema.remove,
+  '/remove/:id', verifyHmacAuthenticity,RestaurantSchema.remove,
   RestaurantController.removeRestaurant
 
 )
