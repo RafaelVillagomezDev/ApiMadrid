@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import restaurantRoutes from './routes/v1/restaurant-routes';
 import imageRoutes from './routes/v1/image-routes';
 import locationRoutes from './routes/v1/location-routes';
+import anonymusRoutes from './routes/v1/user-anonymus-routes';
 import menuRoutes from './routes/v1/menu-routes';
 import cors from 'cors';
 import path from 'path';
@@ -31,7 +32,7 @@ app.use(requestLogger);
 //Cookie Parser
 app.use(initCookieParser)
 //AUTH CSRF
-app.use('/api/', csrfProtection);
+//app.use('/api/', csrfProtection);
 //Rate limit Middleware
 app.use('/api/', apiLimiter);
 
@@ -41,6 +42,7 @@ app.use('/api/v1/restaurant', restaurantRoutes);
 app.use('/api/v1/image', imageRoutes);
 app.use('/api/v1/menu', menuRoutes);
 app.use('/api/v1/location', locationRoutes);
+app.use('/api/v1/anonymous', anonymusRoutes);
 //Logger de errores para capturarlos s
 app.use(errorLogger)
 
