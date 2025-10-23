@@ -3,23 +3,24 @@ import express, { Router } from 'express';
 import { RestaurantSchema } from '../../schemas/restaurant-schema';
 
 import { verifyHmacAuthenticity } from '../../auth/auth-hmac';
+import { authToken } from '../../middleware/auth-token';
 
 const router: Router = express.Router();
 
 router.post(
-  '/create',verifyHmacAuthenticity,
+  '/create',verifyHmacAuthenticity,authToken,
   RestaurantSchema.create,
   RestaurantController.createRestaurant,
 );
 
 router.get(
-  '',RestaurantSchema.get,
+  '',RestaurantSchema.get,authToken,
   RestaurantController.getRestaurants
 
 )
 
 router.post(
-  '/remove/:id', verifyHmacAuthenticity,RestaurantSchema.remove,
+  '/remove/:id',verifyHmacAuthenticity, authToken,RestaurantSchema.remove,
   RestaurantController.removeRestaurant
 
 )
