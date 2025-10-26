@@ -12,7 +12,7 @@ export const authToken = async (
     next: NextFunction,
 ): Promise<void> => {
 
-
+ 
     const authHeader = req.headers["authorization"];
     // 1. Valida Bearer en el header
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
