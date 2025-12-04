@@ -8,7 +8,7 @@ import { authToken } from '../../middleware/auth-token';
 const router: Router = express.Router();
 
 router.post(
-  '/create',verifyHmacAuthenticity,authToken,
+  '/create',
   RestaurantSchema.create,
   RestaurantController.createRestaurant,
 );
