@@ -35,7 +35,10 @@ const AnonymusController = {
             res.status(200).json({
                 message: "Acceso anónimo concedido. Token de acceso emitido.",
                 data: {
-                    token: accessToken,
+                    user:{
+                        token: accessToken,
+                    }
+                
                 },
                 code: 200
             });

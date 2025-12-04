@@ -4,7 +4,7 @@ import logger from '../../src/utils/logger';
 
 export const apiLimiter = rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutos penalizacion
-    max: 50, // 50 solicitudes maximo por IP
+    max: 100, // 50 solicitudes maximo por IP
     standardHeaders: true, 
     legacyHeaders: false,
     message: {
