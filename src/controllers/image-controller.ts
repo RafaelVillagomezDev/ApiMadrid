@@ -19,50 +19,38 @@ interface CustomRequest extends Request {
 
 const ImageController = {
   createImage: async (
-    req: CustomRequest, // Usar la interfaz extendida
+    req: CustomRequest,
     res: Response<ApiResponseInterface>,
     next: NextFunction,
   ): Promise<void> => {
     try {
-      // 1. Validar entrada (sin cambios, es correcto)
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        res.status(400).json({
-          message: 'Error en la validación de los datos.',
-          data: errors.array(),
-          code: 400,
-        });
+        res.status(400).json({ message: 'Error de validación', data: errors.array(), code: 400 });
         return;
       }
 
       const { relatedId, relatedType } = matchedData(req);
-      
-      // 2. 🛑 CLAVE: Obtener los resultados de Cloudinary del middleware
       const cloudinaryResults = req.cloudinaryResults;
 
-      // Verificar si hay resultados del procesamiento
       if (!cloudinaryResults || cloudinaryResults.length === 0) {
-        // Asumimos que si hay archivos, el middleware de subida siempre adjunta algo.
-        // Si falla aquí, el error real debería ser capturado en el middleware anterior.
-        res.status(400).json({
-          message: 'No se encontraron resultados de imágenes procesadas.',
-          code: 400,
-        });
+        res.status(400).json({ message: 'No hay imágenes procesadas.', code: 400 });
         return;
       }
 
-      // 3. Crear registros usando las URLs YA SUBIDAS
       const createdImages = [];
       for (const result of cloudinaryResults) {
-        const url = result.secure_url;
-        const publicId = result.public_id; // Útil para tener una referencia para eliminación futura
+        
+        // 🚀 OPTIMIZACIÓN CRÍTICA: Transformación al vuelo
+        // Insertamos f_auto (formato automático como WebP) y q_auto (calidad automática)
+        // Reemplazamos "/upload/" por "/upload/f_auto,q_auto/"
+        const optimizedUrl = result.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
 
         const image: ImageInterface = {
           id: uuidv4(),
           relatedId,
           relatedType,
-          url,
-     
+          url: optimizedUrl, // Guardamos la URL ya optimizada
         };
 
         const newImageRecord = await ImageFactory.createImage(image);
@@ -70,7 +58,7 @@ const ImageController = {
       }
 
       res.status(200).json({
-        message: 'Imágenes creadas con éxito.',
+        message: 'Imágenes creadas y optimizadas con éxito.',
         code: 200,
       });
     } catch (error) {
