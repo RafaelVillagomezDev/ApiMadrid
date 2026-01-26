@@ -12,13 +12,12 @@ const RestaurantSchema = {
       trim: true,
       escape: true,
       isLength: {
-        options: { max: 50 },
-        errorMessage: 'La  dirección tener máximo 30 caracteres',
+        options: { max: 200 },
+        errorMessage: 'La dirección debe tener máximo 200 caracteres',
       },
       matches: {
-        options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{4,}$/,
-        errorMessage:
-          'La dirección debe tener al menos 4 caracteres alfanuméricos',
+        options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s,.\-#º/]{4,}$/,
+        errorMessage: 'La dirección contiene caracteres no permitidos o es muy corta',
       },
     },
 
