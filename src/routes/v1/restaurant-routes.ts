@@ -1,7 +1,6 @@
 import RestaurantController from '../../controllers/restaurant-controller';
 import express, { Router } from 'express';
 import { RestaurantSchema } from '../../schemas/restaurant-schema';
-
 import { verifyHmacAuthenticity } from '../../auth/auth-hmac';
 import { authToken } from '../../middleware/auth-token';
 
