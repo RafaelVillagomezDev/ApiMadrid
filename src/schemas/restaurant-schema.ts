@@ -75,10 +75,6 @@ const RestaurantSchema = {
         options: { min: 10, max: 1200 },
         errorMessage: 'La descripción debe tener entre 10 y 500 caracteres',
       },
-      matches: {
-        options: /^[a-zA-Z0-9\s.,!?"'-]+$/,
-        errorMessage: 'La descripción contiene caracteres no permitidos',
-      },
     },
     phone: {
       in: ['body'],

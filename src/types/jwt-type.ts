@@ -6,6 +6,7 @@ export interface UserData {
   id_user: string;
   email?: string;
   rol: 'cliente' | 'admin' | 'no_cliente';
+  jti?: string;
 }
 
 /**

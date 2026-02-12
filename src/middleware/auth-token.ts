@@ -39,6 +39,8 @@ export const authToken = async (
             return;
         }
 
+        (req as any).user = payloadToken; 
+
 
 
         next();

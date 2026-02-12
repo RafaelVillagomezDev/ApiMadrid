@@ -3,6 +3,9 @@ import express, { Router } from 'express';
 import { RestaurantSchema } from '../../schemas/restaurant-schema';
 import { verifyHmacAuthenticity } from '../../auth/auth-hmac';
 import { authToken } from '../../middleware/auth-token';
+import { checkBlacklist } from '../../middleware/verify-token-blacklist';
+import { apiLimiter } from '../../middleware/rate-limit-middleware';
+
 
 const router: Router = express.Router();
 
@@ -13,7 +16,7 @@ router.post(
 );
 
 router.get(
-  '',RestaurantSchema.get,authToken,
+  '',authToken, checkBlacklist,
   RestaurantController.getRestaurants
 
 )
