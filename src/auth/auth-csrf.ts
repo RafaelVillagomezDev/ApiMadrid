@@ -25,7 +25,7 @@ export const csrfProtection = (req: Request,
     const isSafeMethod = ['GET', 'HEAD', 'OPTIONS'].includes(req.method);
 
     // 1. Obtener los tokens 
-    let cookieToken = req.cookies[CSRF_COOKIE_NAME];
+    let cookieToken = req.signedCookies[CSRF_COOKIE_NAME] 
     const headerToken = req.headers[CSRF_HEADER_NAME];
 
 
@@ -35,9 +35,9 @@ export const csrfProtection = (req: Request,
         res.cookie(CSRF_COOKIE_NAME, cookieToken, {
             httpOnly: false, // Obligatorio para que el Front lo lea
             secure: req.hostname === 'localhost' ? false : true, // False en local para evitar bloqueos
-            signed: false,   // CAMBIO CLAVE: Sin firma para que el valor sea idéntico al Header
+            signed: true,   // CAMBIO CLAVE: Sin firma para que el valor sea idéntico al Header
             sameSite: 'lax',
-            maxAge: 3600000,
+            maxAge: 1 * 60 * 1000, // 30 minutos
             path: '/'        // Asegura que esté disponible en toda la API
         });
 
