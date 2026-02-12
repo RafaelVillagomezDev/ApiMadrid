@@ -19,7 +19,31 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 const app: Application = express();
 
 
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    callback(null, origin);
+  },
+  
+  // 2. Permite el intercambio de cookies (vital para CSRF y Sesiones)
+  credentials: true,
+  
+  // 3. Métodos permitidos
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  
+  // 4. Headers permitidos (añadimos x-csrf-token)
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'x-csrf-token', 
+    'Accept', 
+    'X-Requested-With'
+  ],
+  
+}));
+
+// Responder explícitamente a OPTIONS antes que a otros middlewares
+app.options('*', cors());
 app.use(express.json());
 app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: true }));
@@ -33,7 +57,7 @@ app.use(requestLogger);
 //Cookie Parser
 app.use(initCookieParser)
 //AUTH CSRF
-//app.use('/api/', csrfProtection);
+app.use('/api/', csrfProtection);
 //Rate limit Middleware
 app.use('/api/', apiLimiter);
 
