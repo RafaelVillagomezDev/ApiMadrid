@@ -2,9 +2,12 @@ import {rateLimit}  from 'express-rate-limit'
 import logger from '../../src/utils/logger';
 
 
+import { decode } from 'jsonwebtoken'; // O la librería que uses para JWT
+import { addToken } from '../models/blacklist/blacklist-model'; 
+
 export const apiLimiter = rateLimit({
-    windowMs: 10 * 60 * 1000, // 10 minutos penalizacion
-    max: 100, // 50 solicitudes maximo por IP
+    windowMs: 10 * 60 * 1000,
+    max: 100,
     standardHeaders: true, 
     legacyHeaders: false,
     message: {
@@ -13,23 +16,38 @@ export const apiLimiter = rateLimit({
         code: 429,
     },
     
-    // --- FUNCIÓN HANDLER MODIFICADA PARA USAR logger.error ---
-    handler: (req, res, next, options) => {
+    handler: async (req, res, next, options) => {
         
-       logger.error('RATE LIMIT SUPERADO: Solicitud rechazada por  DOS', {
-            // Información de la solicitud
+        const authHeader = req.headers.authorization;
+        let jtiToBlock = 'unknown';
+
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.split(' ')[1];
+            try {
+                const decoded = decode(token) as { jti?: string, exp?: number };
+                if (decoded && decoded.jti) {
+                    jtiToBlock = decoded.jti;
+
+                    await addToken(
+                        decoded.jti,
+                        'rate_limit_abuse',
+                        new Date(Date.now() + options.windowMs).toISOString(), 
+                        `Excedió el límite de ${options.max} peticiones`
+                    );
+                }
+            } catch (err) {
+                logger.error('Error al decodificar token en rate limiter', err);
+            }
+        }
+
+    
+        logger.error('RATE LIMIT SUPERADO', {
             ip: req.ip,
+            jti: jtiToBlock,
             endpoint: req.originalUrl,
-            method: req.method,
-            // Información del límite
-            limit: options.max,
-            window: options.windowMs / 1000 + 's',
-            statusCode: options.statusCode
+            method: req.method
         });
         
-        // Termina la solicitud
         res.status(options.statusCode).send(options.message);
     },
 });
-
-// app.use('/api/', apiLimiter); // Tu código existente

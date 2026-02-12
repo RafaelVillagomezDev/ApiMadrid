@@ -9,7 +9,9 @@
     "format": "prettier . --write",
     "dev": "cross-env NODE_ENV=development ts-node-dev --respawn src/index.ts",
     "build": "cross-env NODE_ENV=production tsc",
-    "serve": "node dist/index.js"
+    "serve": "node dist/index.js",
+    "preproduction": "cross-env NODE_ENV=preproduction node dist/index.js",
+    "production": "cross-env NODE_ENV=production node dist/index.js"
   },
   "repository": {
     "type": "git",
