@@ -1,50 +1,39 @@
-// AnonymusController.ts
 import { Request, Response, NextFunction } from 'express';
-
 import { tokenSign } from '../utils/handle-jwt';
 import { ApiResponseInterface } from 'api-type.js';
 import { UserData } from 'jwt-type.js';
-
-// NOTA DE MEJORA: Definir config una sola vez a nivel de módulo
-const config =
-{
-    ANON_USER_ID: process.env.ANON_USER_ID || 'ANON_DEFAULT_ID_FALLBACK',
-}
-
+import crypto from 'crypto'; // Módulo nativo para generar IDs únicos
 
 const AnonymusController = {
-   
     loginAnonymous: async (
         req: Request,
         res: Response<ApiResponseInterface>,
         next: NextFunction
     ): Promise<void> => {
-    
         try {
-  
+            // Generamos un ID único para esta sesión específica
+            const uniqueAnonId = crypto.randomUUID();
+
             const payloadData: UserData = {
-                id_user: config.ANON_USER_ID, 
-                email: `anonymous_${config.ANON_USER_ID}@api.com`, 
+                id_user: uniqueAnonId, 
+                email: `${uniqueAnonId}@api.com`, 
                 rol: 'no_cliente',
+                jti: crypto.randomUUID() 
             };
 
-        
             const accessToken = await tokenSign(payloadData);
 
-       
             res.status(200).json({
-                message: "Acceso anónimo concedido. Token de acceso emitido.",
+                message: "Acceso anónimo único concedido.",
                 data: {
-                    user:{
+                    user: {
                         token: accessToken,
                     }
-                
                 },
                 code: 200
             });
 
         } catch (error) {
-           
             next(error); 
         }
     }

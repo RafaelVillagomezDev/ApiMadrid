@@ -1,10 +1,13 @@
-const checkBlacklist = (): string => {
-    const query = `SELECT * FROM BlacklistEntry 
-WHERE value = ? 
-  AND type = ? 
-  AND (expires_at IS NULL OR expires_at > NOW());`;
-    return query;
+const addTokenBlackList = (): string => {
+
+  const query = `INSERT INTO BlacklistEntry (value, type, expires_at, reason) VALUES (?, ?, ?, ?)`;
+  return query;
 }
 
+const searchTokenBlacklist = (): string => {
+ 
+  const query = `SELECT value FROM BlacklistEntry WHERE value = ? LIMIT 1`;
+  return query;
+}
 
-export { checkBlacklist };
+export { addTokenBlackList, searchTokenBlacklist };
