@@ -13,34 +13,32 @@ import { errorHandler } from './middleware/error-handler';
 import { apiLimiter } from './middleware/rate-limit-middleware';
 import { csrfProtection, initCookieParser } from './auth/auth-csrf';
 
-
-
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 const app: Application = express();
 
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      callback(null, origin);
+    },
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    callback(null, origin);
-  },
-  
-  // 2. Permite el intercambio de cookies (vital para CSRF y Sesiones)
-  credentials: true,
-  
-  // 3. Métodos permitidos
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  
-  // 4. Headers permitidos (añadimos x-csrf-token)
-  allowedHeaders: [
-    'Content-Type', 
-    'Authorization', 
-    'x-csrf-token', 
-    'Accept', 
-    'X-Requested-With'
-  ],
-  
-}));
+    // 2. Permite el intercambio de cookies (vital para CSRF y Sesiones)
+    credentials: true,
+
+    // 3. Métodos permitidos
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+
+    // 4. Headers permitidos (añadimos x-csrf-token)
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'x-csrf-token',
+      'Accept',
+      'X-Requested-With',
+    ],
+  }),
+);
 
 // Responder explícitamente a OPTIONS antes que a otros middlewares
 app.options('*', cors());
@@ -51,11 +49,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const port = 3000;
 
-
 //Logger Winstom
 app.use(requestLogger);
 //Cookie Parser
-app.use(initCookieParser)
+app.use(initCookieParser);
 //AUTH CSRF
 app.use('/api/', csrfProtection);
 //Rate limit Middleware
@@ -69,13 +66,10 @@ app.use('/api/v1/menu', menuRoutes);
 app.use('/api/v1/location', locationRoutes);
 app.use('/api/v1/anonymous', anonymusRoutes);
 //Logger de errores para capturarlos s
-app.use(errorLogger)
+app.use(errorLogger);
 
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
 //Envio errores a Cliente
-app.use(errorHandler)
-
-
-
+app.use(errorHandler);

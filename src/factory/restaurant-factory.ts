@@ -9,19 +9,17 @@ class RestaurantFactory {
     return rows;
   }
 
-
-  static async getRestaurant(obj:RestaurantInterface){
+  static async getRestaurant(obj: RestaurantInterface) {
     const restaurant = new Restaurant(obj);
-    const rows = await restaurant.getRestaurants(restaurant)
+    const rows = await restaurant.getRestaurants(restaurant);
     return rows;
   }
 
   static async removeRestaurant(obj: RestaurantInterface) {
     const restaurant = new Restaurant(obj);
     await restaurant.existRestaurant();
-    const rows = await restaurant.removeRestaurants()
+    const rows = await restaurant.removeRestaurants();
     return rows;
   }
-
 }
 export { RestaurantFactory };

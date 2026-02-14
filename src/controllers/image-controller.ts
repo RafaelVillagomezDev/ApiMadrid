@@ -8,7 +8,7 @@ import { ImageFactory } from '../factory/image-factory';
 // Definición de una interfaz para los resultados de Cloudinary adjuntos por el middleware
 interface CloudinaryResult {
   secure_url: string;
-  public_id: string; 
+  public_id: string;
   // Otros campos de Cloudinary que necesites
 }
 
@@ -26,7 +26,13 @@ const ImageController = {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        res.status(400).json({ message: 'Error de validación', data: errors.array(), code: 400 });
+        res
+          .status(400)
+          .json({
+            message: 'Error de validación',
+            data: errors.array(),
+            code: 400,
+          });
         return;
       }
 
@@ -34,17 +40,21 @@ const ImageController = {
       const cloudinaryResults = req.cloudinaryResults;
 
       if (!cloudinaryResults || cloudinaryResults.length === 0) {
-        res.status(400).json({ message: 'No hay imágenes procesadas.', code: 400 });
+        res
+          .status(400)
+          .json({ message: 'No hay imágenes procesadas.', code: 400 });
         return;
       }
 
       const createdImages = [];
       for (const result of cloudinaryResults) {
-        
         // 🚀 OPTIMIZACIÓN CRÍTICA: Transformación al vuelo
         // Insertamos f_auto (formato automático como WebP) y q_auto (calidad automática)
         // Reemplazamos "/upload/" por "/upload/f_auto,q_auto/"
-        const optimizedUrl = result.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
+        const optimizedUrl = result.secure_url.replace(
+          '/upload/',
+          '/upload/f_auto,q_auto/',
+        );
 
         const image: ImageInterface = {
           id: uuidv4(),

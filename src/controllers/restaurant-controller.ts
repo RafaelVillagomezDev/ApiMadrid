@@ -1,7 +1,12 @@
 import { ApiResponseInterface } from 'api-type';
 import { Request, Response, NextFunction } from 'express';
 import { matchedData, validationResult } from 'express-validator';
-import { RestaurantInterface, RestaurantQueryInterface, RestaurantQueryPagination, RestaurantRemoveQueryInterface } from 'restaurant-type';
+import {
+  RestaurantInterface,
+  RestaurantQueryInterface,
+  RestaurantQueryPagination,
+  RestaurantRemoveQueryInterface,
+} from 'restaurant-type';
 import { RestaurantFactory } from '../factory/restaurant-factory';
 import { v4 as uuidv4 } from 'uuid';
 import { getCoords } from '../utils/geodata';
@@ -15,16 +20,20 @@ const RestaurantController = {
     next: NextFunction,
   ): Promise<void> => {
     try {
-
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        res.status(400).json({ message: 'Error en validación', data: errors.array(), code: 400 });
+        res
+          .status(400)
+          .json({
+            message: 'Error en validación',
+            data: errors.array(),
+            code: 400,
+          });
         return;
       }
 
       const validData = matchedData(req);
       const restaurantId = uuidv4();
-
 
       const restaurant: RestaurantInterface = {
         id: restaurantId,
@@ -34,9 +43,8 @@ const RestaurantController = {
         description: validData.description,
         phone: validData.phone,
         type_food: validData.type_food,
-        web: validData.web
+        web: validData.web,
       };
-
 
       const geoData = await getCoords(validData.address);
 
@@ -62,7 +70,6 @@ const RestaurantController = {
         message: 'Restaurante creado con éxito con sus imágenes y localización',
         code: 200,
       });
-
     } catch (error) {
       next(error);
     }
@@ -92,22 +99,21 @@ const RestaurantController = {
         id: validData.id,
         address: validData.address,
         limit: validData.limit,
-        offset: validData.offset
-      }
+        offset: validData.offset,
+      };
 
-      const data = await RestaurantFactory.getRestaurant(queryData)
+      const data = await RestaurantFactory.getRestaurant(queryData);
 
       const response: ApiResponseInterface = {
         message: 'Restaurante obtenidos con éxito',
         data: data,
         code: 200,
-        count: data.length
+        count: data.length,
       };
 
       res.status(200).send(response);
-
     } catch (error) {
-      next(error)
+      next(error);
     }
   },
   removeRestaurant: async (
@@ -131,10 +137,10 @@ const RestaurantController = {
       const validData = matchedData(req);
 
       const restaurant: RestaurantRemoveQueryInterface = {
-        id: validData.id
-      }
+        id: validData.id,
+      };
 
-      await RestaurantFactory.removeRestaurant(restaurant)
+      await RestaurantFactory.removeRestaurant(restaurant);
 
       const response: ApiResponseInterface = {
         message: 'Restaurante eliiminado con éxito',
@@ -142,13 +148,10 @@ const RestaurantController = {
       };
 
       res.status(200).json(response);
-
     } catch (error) {
-      next(error)
+      next(error);
     }
   },
 };
 
 export default RestaurantController;
-
-

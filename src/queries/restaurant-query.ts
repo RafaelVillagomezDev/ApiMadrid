@@ -1,4 +1,4 @@
-import { RestaurantQueryPagination } from "restaurant-type";
+import { RestaurantQueryPagination } from 'restaurant-type';
 
 const createRestaurant = (): string => {
   const query = `INSERT IGNORE INTO RESTAURANT (id,email,name,address,description,phone,type_food,web) VALUES (?, ?, ?, ?,?,?,?,?);`;
@@ -14,15 +14,13 @@ const isRestaurant = (): string => {
   return query;
 };
 
-
 const getRestaurantData = ({
   id,
   name,
   address,
   limit,
-  offset
+  offset,
 }: any): [string, any[]] => {
-
   const conditions: string[] = [];
   const filterValues: any[] = [];
 
@@ -42,15 +40,11 @@ const getRestaurantData = ({
   }
 
   const whereClause =
-    conditions.length > 0
-      ? `WHERE ${conditions.join(' AND ')}`
-      : '';
+    conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
   // 🔒 Conversión segura
   const safeLimit =
-    Number.isInteger(Number(limit)) && Number(limit) >= 0
-      ? Number(limit)
-      : 10;
+    Number.isInteger(Number(limit)) && Number(limit) >= 0 ? Number(limit) : 10;
 
   const safeOffset =
     Number.isInteger(Number(offset)) && Number(offset) >= 0
@@ -99,11 +93,7 @@ const getRestaurantData = ({
   `;
 
   // ⚠ IMPORTANTE: offset primero, luego limit
-  const values = [
-    ...filterValues,
-    safeOffset,
-    safeLimit
-  ];
+  const values = [...filterValues, safeOffset, safeLimit];
 
   return [query.trim(), values];
 };
@@ -130,17 +120,20 @@ const formatRestaurantData = (rows: any[]) => {
               latitude: row.location_latitude,
               longitude: row.location_longitude,
               country: row.location_country,
-              county: row.location_county
+              county: row.location_county,
             }
           : null,
-        menus: []
+        menus: [],
       });
     }
 
     const restaurant = restaurantsMap.get(row.restaurant_id);
 
     // Agrupar imágenes (opcional si hay varias)
-    if (row.image_id && !restaurant.images.find((img: any) => img.id === row.image_id)) {
+    if (
+      row.image_id &&
+      !restaurant.images.find((img: any) => img.id === row.image_id)
+    ) {
       restaurant.images.push({ id: row.image_id, url: row.image_url });
     }
 
@@ -152,19 +145,23 @@ const formatRestaurantData = (rows: any[]) => {
         id: row.menu_id,
         name: row.menu_name,
         description: row.menu_description,
-        dishes: []
+        dishes: [],
       };
       restaurant.menus.push(menu);
     }
 
     // Agregar plato si existe
-    if (menu && row.dish_id && !menu.dishes.find((d: any) => d.id === row.dish_id)) {
+    if (
+      menu &&
+      row.dish_id &&
+      !menu.dishes.find((d: any) => d.id === row.dish_id)
+    ) {
       menu.dishes.push({
         id: row.dish_id,
         name: row.dish_name,
         description: row.dish_description,
         price: row.dish_price,
-        category: row.dish_category
+        category: row.dish_category,
       });
     }
   }
@@ -172,14 +169,16 @@ const formatRestaurantData = (rows: any[]) => {
   return Array.from(restaurantsMap.values());
 };
 
-
 const removeRestaurantsData = (): string => {
   const query = `DELETE FROM restaurant WHERE id = ?;`;
   return query;
 };
 
-
-
-
-
-export { createRestaurant, existRestaurant, isRestaurant,getRestaurantData ,formatRestaurantData,removeRestaurantsData};
+export {
+  createRestaurant,
+  existRestaurant,
+  isRestaurant,
+  getRestaurantData,
+  formatRestaurantData,
+  removeRestaurantsData,
+};

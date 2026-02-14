@@ -4,12 +4,12 @@ interface RestaurantInterface {
   address?: string;
   email?: string;
   description?: Text;
-  phone?:string,
-  type_food?:string,
-  web?:string
+  phone?: string;
+  type_food?: string;
+  web?: string;
   [key: string]: any;
-  limit?:number;
-  offset?:number;
+  limit?: number;
+  offset?: number;
 }
 
 /**
@@ -18,20 +18,25 @@ interface RestaurantInterface {
  * mientras que RestaurantInterface tiene claves específicas y no acepta claves arbitrarias.
  */
 
-interface RestaurantQueryInterface{
-  name?:string,
-  address?:string,
+interface RestaurantQueryInterface {
+  name?: string;
+  address?: string;
 }
 
-interface RestaurantRemoveQueryInterface{
-  id:string
+interface RestaurantRemoveQueryInterface {
+  id: string;
 }
 
-interface RestaurantQueryPagination{
-  id?:string,
-  name?:string,
-  address?:string,
-  limit?:number,
-  offset?:number
+interface RestaurantQueryPagination {
+  id?: string;
+  name?: string;
+  address?: string;
+  limit?: number;
+  offset?: number;
 }
-export { RestaurantInterface , RestaurantQueryInterface,RestaurantQueryPagination ,RestaurantRemoveQueryInterface};
+export {
+  RestaurantInterface,
+  RestaurantQueryInterface,
+  RestaurantQueryPagination,
+  RestaurantRemoveQueryInterface,
+};

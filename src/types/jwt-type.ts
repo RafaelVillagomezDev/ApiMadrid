@@ -17,5 +17,4 @@ export interface JWTPayload extends UserData {
   // Claims estándar añadidos por jsonwebtoken
   iat: number; // Issued At (Marca de tiempo de emisión)
   exp: number; // Expiration Time (Marca de tiempo de expiración)
-
 }

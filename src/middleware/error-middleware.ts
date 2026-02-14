@@ -5,7 +5,7 @@ export const errorLogger = (
   err: unknown,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void => {
   const error = err instanceof Error ? err : new Error(String(err));
 
@@ -20,8 +20,7 @@ export const errorLogger = (
     stack: error.stack,
   };
 
-  
   logger.error(`${req.method} ${req.originalUrl} - ERROR`, logData);
 
-  next(error); 
+  next(error);
 };

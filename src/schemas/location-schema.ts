@@ -68,9 +68,8 @@ const LocationSchema = {
       },
     },
   }),
-  get : checkSchema({
-
-      relatedType: {
+  get: checkSchema({
+    relatedType: {
       in: ['params'],
       exists: {
         options: {
@@ -107,9 +106,8 @@ const LocationSchema = {
           return true;
         },
       },
-    }
-
-  })
+    },
+  }),
 };
 
 export { LocationSchema };

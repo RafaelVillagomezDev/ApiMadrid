@@ -13,7 +13,6 @@ const getLocation = (): string => {
   FROM location WHERE relatedId = ? 
    `;
   return query;
-}
-
+};
 
 export { existLocation, createLocation, getLocation };

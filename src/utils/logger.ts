@@ -13,29 +13,31 @@ if (!fs.existsSync(logDir)) {
 }
 
 // Formato personalizado para la consola
-const consoleFormat = winston.format.printf(({ level, message, timestamp, ...meta }) => {
-  return `[${timestamp}] [${level.toUpperCase()}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
-});
+const consoleFormat = winston.format.printf(
+  ({ level, message, timestamp, ...meta }) => {
+    return `[${timestamp}] [${level.toUpperCase()}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+  },
+);
 
 // Crear el logger
 const logger = winston.createLogger({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',  // 'info' para producción y 'debug' en desarrollo
+  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug', // 'info' para producción y 'debug' en desarrollo
   format: winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.errors({ stack: true }),
     winston.format.splat(),
-    winston.format.json()  // Los logs en producción se guardan en formato JSON
+    winston.format.json(), // Los logs en producción se guardan en formato JSON
   ),
   transports: [
     // 🟥 Solo errores
     new winston.transports.File({
       filename: path.join(logDir, 'error.log'),
-      level: 'error',  // Solo registrar errores
+      level: 'error', // Solo registrar errores
     }),
     // 🟨 Todos los logs (incluye 'info', 'warn', 'debug', 'error')
     new winston.transports.File({
       filename: path.join(logDir, 'combined.log'),
-      level: 'info',  // 'info' captura todos los niveles: info, warn, error
+      level: 'info', // 'info' captura todos los niveles: info, warn, error
     }),
   ],
 });
@@ -47,9 +49,9 @@ if (process.env.NODE_ENV !== 'production') {
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.timestamp(),
-        consoleFormat  // Formato personalizado para consola
+        consoleFormat, // Formato personalizado para consola
       ),
-    })
+    }),
   );
 }
 
