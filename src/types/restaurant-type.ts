@@ -8,6 +8,8 @@ interface RestaurantInterface {
   type_food?:string,
   web?:string
   [key: string]: any;
+  limit?:number;
+  offset?:number;
 }
 
 /**

@@ -17,6 +17,7 @@ router.post(
 
 router.get(
   '',authToken, checkBlacklist,
+  RestaurantSchema.get,
   RestaurantController.getRestaurants
 
 )

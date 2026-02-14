@@ -189,7 +189,8 @@ const RestaurantSchema = {
       },
       isInt:{
         errorMessage:"El limite es invalido debe ser un entero"
-      }
+      },
+      toInt: true
     },
     offset:{
       in: ["query"],
@@ -203,7 +204,9 @@ const RestaurantSchema = {
       },
       isInt:{
         errorMessage:"La paginación es invalida debe ser un entero"
-      }
+      },
+      toInt: true
+    
     },
   }),
   remove: checkSchema({

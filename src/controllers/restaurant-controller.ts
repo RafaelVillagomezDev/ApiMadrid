@@ -4,7 +4,6 @@ import { matchedData, validationResult } from 'express-validator';
 import { RestaurantInterface, RestaurantQueryInterface, RestaurantQueryPagination, RestaurantRemoveQueryInterface } from 'restaurant-type';
 import { RestaurantFactory } from '../factory/restaurant-factory';
 import { v4 as uuidv4 } from 'uuid';
-import { Restaurant } from '../models/restaurant/restaurant-model';
 import { getCoords } from '../utils/geodata';
 import { LocationInterface } from 'location-type';
 import { LocationFactory } from '../factory/location-factory';
@@ -88,7 +87,7 @@ const RestaurantController = {
 
       const validData = matchedData(req);
 
-      const query: RestaurantQueryPagination = {
+      const queryData: RestaurantQueryPagination = {
         name: validData.name,
         id: validData.id,
         address: validData.address,
@@ -96,7 +95,7 @@ const RestaurantController = {
         offset: validData.offset
       }
 
-      const data = await Restaurant.getRestaurants(query)
+      const data = await RestaurantFactory.getRestaurant(queryData)
 
       const response: ApiResponseInterface = {
         message: 'Restaurante obtenidos con éxito',
@@ -142,7 +141,7 @@ const RestaurantController = {
         code: 200,
       };
 
-      res.status(200).send(response);
+      res.status(200).json(response);
 
     } catch (error) {
       next(error)

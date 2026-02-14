@@ -37,7 +37,7 @@ export const csrfProtection = (req: Request,
             secure: req.hostname === 'localhost' ? false : true, // False en local para evitar bloqueos
             signed: true,   // CAMBIO CLAVE: Sin firma para que el valor sea idéntico al Header
             sameSite: 'lax',
-            maxAge: 1 * 60 * 1000, // 30 minutos
+            maxAge: 30 * 60 * 1000, // 30 minutos
             path: '/'        // Asegura que esté disponible en toda la API
         });
 
