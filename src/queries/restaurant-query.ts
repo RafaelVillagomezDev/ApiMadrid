@@ -19,71 +19,91 @@ const getRestaurantData = ({
   id,
   name,
   address,
-  limit = 20,
-  offset = 0
-}: RestaurantQueryPagination): [string, any[]] => {
-  let query = `
-    SELECT 
-      restaurant.id AS restaurant_id,
-      restaurant.name AS restaurant_name,
-      restaurant.email AS restaurant_email,
-      restaurant.address AS restaurant_address,
-      restaurant.description AS restaurant_description,
-      restaurant.phone AS restaurant_phone,
-      restaurant.type_food AS restaurant_type_food,
-      restaurant.web AS restaurant_web,
+  limit,
+  offset
+}: any): [string, any[]] => {
 
+  const conditions: string[] = [];
+  const filterValues: any[] = [];
+
+  if (id) {
+    conditions.push(`id = ?`);
+    filterValues.push(id);
+  }
+
+  if (name) {
+    conditions.push(`name LIKE ?`);
+    filterValues.push(`%${name}%`);
+  }
+
+  if (address) {
+    conditions.push(`address LIKE ?`);
+    filterValues.push(`%${address}%`);
+  }
+
+  const whereClause =
+    conditions.length > 0
+      ? `WHERE ${conditions.join(' AND ')}`
+      : '';
+
+  // 🔒 Conversión segura
+  const safeLimit =
+    Number.isInteger(Number(limit)) && Number(limit) >= 0
+      ? Number(limit)
+      : 10;
+
+  const safeOffset =
+    Number.isInteger(Number(offset)) && Number(offset) >= 0
+      ? Number(offset)
+      : 0;
+
+  const query = `
+    SELECT 
+      r.id AS restaurant_id,
+      r.name AS restaurant_name,
+      r.email AS restaurant_email,
+      r.address AS restaurant_address,
+      r.description AS restaurant_description,
+      r.phone AS restaurant_phone,
+      r.type_food AS restaurant_type_food,
+      r.web AS restaurant_web,
       images.id AS image_id,
       images.url AS image_url,
-
       location.id AS location_id,
       location.address AS location_address,
       location.latitude AS location_latitude,
       location.longitude AS location_longitude,
       location.country AS location_country,
       location.county AS location_county,
-
       menu.id AS menu_id,
       menu.name AS menu_name,
       menu.description AS menu_description,
-
       dishes.id AS dish_id,
       dishes.name AS dish_name,
       dishes.description AS dish_description,
       dishes.price AS dish_price,
       dishes.category AS dish_category
-
-    FROM restaurant
-    LEFT JOIN images ON restaurant.id = images.relatedId
-    LEFT JOIN location ON restaurant.id = location.relatedId
-    LEFT JOIN menu ON restaurant.id = menu.restaurant_id
+    FROM (
+      SELECT id 
+      FROM restaurant 
+      ${whereClause}
+      ORDER BY id ASC 
+      LIMIT ?, ?
+    ) AS ids
+    INNER JOIN restaurant r ON ids.id = r.id
+    LEFT JOIN images ON r.id = images.relatedId
+    LEFT JOIN location ON r.id = location.relatedId
+    LEFT JOIN menu ON r.id = menu.restaurant_id
     LEFT JOIN dishes ON menu.id = dishes.menu_id
+    ORDER BY r.id ASC, menu.id ASC, dishes.id ASC;
   `;
 
-  const conditions: string[] = [];
-  const values: any[] = [];
-
-  if (id) {
-    conditions.push(`restaurant.id = ?`);
-    values.push(id);
-  }
-
-  if (name) {
-    conditions.push(`restaurant.name LIKE ?`);
-    values.push(`%${name}%`);
-  }
-
-  if (address) {
-    conditions.push(`restaurant.address LIKE ?`);
-    values.push(`%${address}%`);
-  }
-
-  if (conditions.length > 0) {
-    query += ` WHERE ` + conditions.join(' AND ');
-  }
-
-  query += ` ORDER BY restaurant.id LIMIT ? OFFSET ?`;
-  values.push(Number(limit), Number(offset));
+  // ⚠ IMPORTANTE: offset primero, luego limit
+  const values = [
+    ...filterValues,
+    safeOffset,
+    safeLimit
+  ];
 
   return [query.trim(), values];
 };

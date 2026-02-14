@@ -10,6 +10,12 @@ class RestaurantFactory {
   }
 
 
+  static async getRestaurant(obj:RestaurantInterface){
+    const restaurant = new Restaurant(obj);
+    const rows = await restaurant.getRestaurants(restaurant)
+    return rows;
+  }
+
   static async removeRestaurant(obj: RestaurantInterface) {
     const restaurant = new Restaurant(obj);
     await restaurant.existRestaurant();
