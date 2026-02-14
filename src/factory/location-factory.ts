@@ -9,9 +9,9 @@ class LocationFactory {
     return rows;
   }
 
-  static async getLocation(obj: LocationInterface){
+  static async getLocation(obj: LocationInterface) {
     const location = new Location(obj);
-    const rows = await location.getLocation()
+    const rows = await location.getLocation();
     return rows;
   }
 }

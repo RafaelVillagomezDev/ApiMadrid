@@ -12,7 +12,7 @@ class Menu implements MenuInterface {
   dishes: DishInterface[];
 
   constructor({ id, restaurant_id, name, description, dishes }: MenuInterface) {
-    this.id = id 
+    this.id = id;
     this.restaurant_id = restaurant_id;
     this.name = name;
     this.description = description;
@@ -54,9 +54,8 @@ class Menu implements MenuInterface {
       return menuResult.affectedRows;
     } catch (err) {
       await conn.rollback();
-    
-      throw  new Error('Error al crear el menú:');
-      
+
+      throw new Error('Error al crear el menú:');
     } finally {
       conn.release();
     }

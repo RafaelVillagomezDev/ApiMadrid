@@ -17,7 +17,8 @@ const RestaurantSchema = {
       },
       matches: {
         options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s,.\-#º/]{4,}$/,
-        errorMessage: 'La dirección contiene caracteres no permitidos o es muy corta',
+        errorMessage:
+          'La dirección contiene caracteres no permitidos o es muy corta',
       },
     },
 
@@ -67,7 +68,7 @@ const RestaurantSchema = {
     description: {
       in: ['body'],
       trim: true,
-      escape:true,
+      escape: true,
       notEmpty: {
         errorMessage: 'La descripción no puede estar vacía',
       },
@@ -79,7 +80,7 @@ const RestaurantSchema = {
     phone: {
       in: ['body'],
       trim: true,
-      escape:true,
+      escape: true,
       notEmpty: {
         errorMessage: 'El teléfono no puede estar vacío',
       },
@@ -89,7 +90,8 @@ const RestaurantSchema = {
       },
       matches: {
         options: /^(\+?\d{1,4}|00\d{1,4})?\d{6,12}$/,
-        errorMessage: 'El teléfono contiene un formato inválido (solo números, sin espacios)',
+        errorMessage:
+          'El teléfono contiene un formato inválido (solo números, sin espacios)',
       },
     },
     type_food: {
@@ -118,14 +120,13 @@ const RestaurantSchema = {
       },
       matches: {
         options: /^(https?:\/\/)?(www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/\S*)?$/,
-        errorMessage: 'La web debe ser una URL válida (ej. https://ejemplo.com)',
+        errorMessage:
+          'La web debe ser una URL válida (ej. https://ejemplo.com)',
       },
-    }
-    
-    
+    },
   }),
   get: checkSchema({
-    id:{
+    id: {
       in: ['params'],
       isUUID: {
         errorMessage: 'Id debe ser un UUID válido',
@@ -148,7 +149,7 @@ const RestaurantSchema = {
       },
     },
     name: {
-      in: ["query"],
+      in: ['query'],
       optional: true,
       errorMessage: 'Nombre inválido',
       isLength: {
@@ -159,10 +160,10 @@ const RestaurantSchema = {
         options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{4,}$/,
         errorMessage:
           'El nombre debe tener al menos 4 caracteres alfanuméricos',
-      }
+      },
     },
     address: {
-      in: ["query"],
+      in: ['query'],
       optional: true,
       errorMessage: 'Dirección inválida',
       trim: true,
@@ -175,10 +176,10 @@ const RestaurantSchema = {
         options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{4,}$/,
         errorMessage:
           'La dirección debe tener al menos 4 caracteres alfanuméricos',
-      }
+      },
     },
-    limit:{
-      in: ["query"],
+    limit: {
+      in: ['query'],
       optional: true,
       errorMessage: 'Limite invalido',
       trim: true,
@@ -187,13 +188,13 @@ const RestaurantSchema = {
         options: { max: 2 },
         errorMessage: 'El limite debe tener como maximo 2 cifras',
       },
-      isInt:{
-        errorMessage:"El limite es invalido debe ser un entero"
+      isInt: {
+        errorMessage: 'El limite es invalido debe ser un entero',
       },
-      toInt: true
+      toInt: true,
     },
-    offset:{
-      in: ["query"],
+    offset: {
+      in: ['query'],
       optional: true,
       errorMessage: 'Paginación invalida',
       trim: true,
@@ -202,15 +203,14 @@ const RestaurantSchema = {
         options: { max: 2 },
         errorMessage: 'La paginación debe tener como maximo 2 cifras',
       },
-      isInt:{
-        errorMessage:"La paginación es invalida debe ser un entero"
+      isInt: {
+        errorMessage: 'La paginación es invalida debe ser un entero',
       },
-      toInt: true
-    
+      toInt: true,
     },
   }),
   remove: checkSchema({
-    id:{
+    id: {
       in: ['params'],
       isUUID: {
         errorMessage: 'Id debe ser un UUID válido',
@@ -232,8 +232,7 @@ const RestaurantSchema = {
         },
       },
     },
-  })
-  
+  }),
 };
 
 export { RestaurantSchema };

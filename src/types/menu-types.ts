@@ -13,4 +13,4 @@ interface MenuInterface {
   dishes: DishInterface[];
 }
 
-export { MenuInterface ,DishInterface};
+export { MenuInterface, DishInterface };

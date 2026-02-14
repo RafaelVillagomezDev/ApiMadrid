@@ -5,7 +5,7 @@ const MenuSchema = {
     restaurant_id: {
       in: ['body'],
       trim: true,
-      optional:false,
+      optional: false,
       isUUID: {
         errorMessage: 'El ID del restaurante debe ser un UUID válido',
       },
@@ -13,7 +13,7 @@ const MenuSchema = {
     name: {
       in: ['body'],
       trim: true,
-      optional:false,
+      optional: false,
       isLength: {
         options: { min: 3, max: 100 },
         errorMessage: 'El nombre del menú debe tener entre 3 y 100 caracteres',
@@ -25,10 +25,11 @@ const MenuSchema = {
       trim: true,
       isLength: {
         options: { min: 3, max: 250 },
-        errorMessage: 'La descripción del menú debe tener al menos 3 caracteres',
+        errorMessage:
+          'La descripción del menú debe tener al menos 3 caracteres',
       },
     },
-    'dishes': {
+    dishes: {
       in: ['body'],
       isArray: {
         options: { min: 1 },
@@ -53,7 +54,8 @@ const MenuSchema = {
       trim: true,
       isLength: {
         options: { min: 3, max: 250 },
-        errorMessage: 'La descripción del plato debe tener entre 3 y 250 caracteres',
+        errorMessage:
+          'La descripción del plato debe tener entre 3 y 250 caracteres',
       },
       matches: {
         options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,()]+$/,
@@ -72,7 +74,8 @@ const MenuSchema = {
       trim: true,
       isLength: {
         options: { min: 3, max: 50 },
-        errorMessage: 'La categoría del plato debe tener entre 3 y 50 caracteres',
+        errorMessage:
+          'La categoría del plato debe tener entre 3 y 50 caracteres',
       },
       matches: {
         options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,

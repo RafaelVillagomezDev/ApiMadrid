@@ -91,15 +91,14 @@ const LocationController = {
         message: 'Restaurante obtenido con éxito',
         data: data,
         code: 200,
-        count: 1
+        count: 1,
       };
 
       res.status(200).send(response);
-
     } catch (error) {
       next(error);
     }
-  }
+  },
 };
 
 export default LocationController;

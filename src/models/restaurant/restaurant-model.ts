@@ -1,4 +1,7 @@
-import { RestaurantInterface, RestaurantQueryPagination } from 'restaurant-type';
+import {
+  RestaurantInterface,
+  RestaurantQueryPagination,
+} from 'restaurant-type';
 import {
   createRestaurant,
   existRestaurant,
@@ -23,7 +26,18 @@ class Restaurant implements RestaurantInterface {
   limit?: number | undefined;
   offset?: number | undefined;
 
-  constructor({ id, email, name, address, description, phone, type_food, web ,limit,offset }: RestaurantInterface) {
+  constructor({
+    id,
+    email,
+    name,
+    address,
+    description,
+    phone,
+    type_food,
+    web,
+    limit,
+    offset,
+  }: RestaurantInterface) {
     this.id = id;
     this.email = email;
     this.name = name;
@@ -32,8 +46,8 @@ class Restaurant implements RestaurantInterface {
     this.phone = phone;
     this.type_food = type_food;
     this.web = web;
-    this.limit=limit;
-    this.offset=offset;
+    this.limit = limit;
+    this.offset = offset;
   }
 
   async createRestaurant(): Promise<number> {
@@ -46,7 +60,7 @@ class Restaurant implements RestaurantInterface {
       this.description,
       this.phone,
       this.type_food,
-      this.web
+      this.web,
     ]);
 
     if (result.affectedRows === 0) {
@@ -76,35 +90,37 @@ class Restaurant implements RestaurantInterface {
       name,
       address,
       limit,
-      offset
+      offset,
     });
 
-
-    const [rows]: [any[], any] = await promisePool.query(queryRestaurants, values);
+    const [rows]: [any[], any] = await promisePool.query(
+      queryRestaurants,
+      values,
+    );
 
     if (!rows || rows.length === 0) {
       throw new Error('No existen restaurantes con esas condiciones');
     }
 
     const result = formatRestaurantData(rows);
-    console.log("Valores enviados a MySQL:", values); // Verifica que el penúltimo número sea un 2
-    console.log("Cantidad de objetos después de formatear:", result.length);
+    console.log('Valores enviados a MySQL:', values); // Verifica que el penúltimo número sea un 2
+    console.log('Cantidad de objetos después de formatear:', result.length);
     return result;
   }
 
-
   async removeRestaurants(): Promise<number> {
-
     const queryRemoveRestaurants = removeRestaurantsData();
 
-
-    const [rows]: [any[], any] = await promisePool.query(queryRemoveRestaurants, [this.id]);
+    const [rows]: [any[], any] = await promisePool.query(
+      queryRemoveRestaurants,
+      [this.id],
+    );
 
     if (rows.length === 0) {
       throw new Error('No existen restaurantes con esas condiciones');
     }
 
-    return rows.length
+    return rows.length;
   }
 }
 
