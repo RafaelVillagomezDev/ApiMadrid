@@ -14,6 +14,31 @@ const isRestaurant = (): string => {
   return query;
 };
 
+
+const countTotalRestaurants = ({ id, name, address }: any): [string, any[]] => {
+  const conditions: string[] = [];
+  const filterValues: any[] = [];
+
+  if (id) {
+    conditions.push(`id = ?`);
+    filterValues.push(id);
+  }
+  if (name) {
+    conditions.push(`name LIKE ?`);
+    filterValues.push(`%${name}%`);
+  }
+  if (address) {
+    conditions.push(`address LIKE ?`);
+    filterValues.push(`%${address}%`);
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+  
+  // Usamos COUNT(*) en MySQL
+  const query = `SELECT COUNT(*) AS total FROM restaurant ${whereClause};`;
+
+  return [query, filterValues];
+};
 const getRestaurantData = ({
   id,
   name,
@@ -181,4 +206,5 @@ export {
   getRestaurantData,
   formatRestaurantData,
   removeRestaurantsData,
+  countTotalRestaurants
 };
