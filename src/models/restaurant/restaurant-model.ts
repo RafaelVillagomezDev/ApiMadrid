@@ -3,6 +3,7 @@ import {
   RestaurantQueryPagination,
 } from 'restaurant-type';
 import {
+  countTotalRestaurants,
   createRestaurant,
   existRestaurant,
   formatRestaurantData,
@@ -83,6 +84,8 @@ class Restaurant implements RestaurantInterface {
     return rows.length;
   }
 
+
+
   async getRestaurants(obj: RestaurantQueryPagination) {
     const { id, name, address, limit, offset } = obj;
     const [queryRestaurants, values] = getRestaurantData({
@@ -93,19 +96,25 @@ class Restaurant implements RestaurantInterface {
       offset,
     });
 
-    const [rows]: [any[], any] = await promisePool.query(
-      queryRestaurants,
-      values,
-    );
+    const [queryCount, countValues] = countTotalRestaurants({ id, name, address });
+
+    const [[rows], [countRows]]: [any[], any] = await Promise.all([
+      promisePool.query(queryRestaurants, values),
+      promisePool.query(queryCount, countValues)
+    ]);
 
     if (!rows || rows.length === 0) {
       throw new Error('No existen restaurantes con esas condiciones');
     }
 
-    const result = formatRestaurantData(rows);
-    console.log('Valores enviados a MySQL:', values); // Verifica que el penúltimo número sea un 2
-    console.log('Cantidad de objetos después de formatear:', result.length);
-    return result;
+    const data = formatRestaurantData(rows);
+    const total = countRows[0].total;
+    
+    
+    return {
+      "data":data,
+      "total":total
+    };
   }
 
   async removeRestaurants(): Promise<number> {

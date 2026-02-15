@@ -106,9 +106,9 @@ const RestaurantController = {
 
       const response: ApiResponseInterface = {
         message: 'Restaurante obtenidos con éxito',
-        data: data,
+        data: data.data,
         code: 200,
-        count: data.length,
+        count: data.total,
       };
 
       res.status(200).send(response);
