@@ -67,7 +67,11 @@ const RestaurantController = {
       ]);
 
       res.status(200).send({
-        message: 'Restaurante creado con éxito con sus imágenes y localización',
+        message: 'Restaurante creado con éxito',
+        data:{
+          "id":restaurantId,
+          "relatedType":"restaurant"
+        },
         code: 200,
       });
     } catch (error) {
