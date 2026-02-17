@@ -1,30 +1,25 @@
+// cloudinary.ts
 import { v2 as cloudinary } from 'cloudinary';
 
-// Bandera para asegurar que la configuración solo se ejecute una vez por proceso
-let isCloudinaryConfigured = false;
+export const configureCloudinary = () => {
+  const config = {
+    cloud_name: process.env.CLOUDNAME,
+    api_key: process.env.APIKEYCLOUDINARY,
+    api_secret: process.env.APISECRETCLOUDINARY,
+  };
 
-// 1. Función interna que configura Cloudinary
-const configureCloudinary = (): void => {
-  if (isCloudinaryConfigured) return;
-
-  const cloudName = process.env.CLOUDNAME;
-  const apiKey = process.env.APIKEYCLOUDINARY;
-  const apiSecret = process.env.APISECRETCLOUDINARY;
-
-  if (!cloudName || !apiKey || !apiSecret) {
-    throw new Error(
-      'CONFIG ERROR: Falta una o más variables de entorno de Cloudinary (CLOUDNAME, APIKEYCLOUDINARY, APISECRETCLOUDINARY).',
-    );
+  //  Verificación de Variables de Entorno
+  if (!config.cloud_name || !config.api_key || !config.api_secret) {
+    console.error('❌ [ERROR CRÍTICO]: Faltan variables de entorno de Cloudinary.');
+    process.exit(1); // Detiene el servidor si no hay credenciales
   }
 
-  cloudinary.config({
-    cloud_name: cloudName,
-    api_key: apiKey,
-    api_secret: apiSecret,
-  });
+  cloudinary.config({ ...config, secure: true });
 
-  isCloudinaryConfigured = true;
-  console.log('[Cloudinary] Configuración cargada al primer uso.');
+  
+  cloudinary.api.ping()
+    .then(() => console.log('✅ Cloudinary conectado y autenticado correctamente'))
+    .catch((err) => {
+      console.error('❌ Error de conexión con Cloudinary:', err.message);
+    });
 };
-
-export { configureCloudinary };

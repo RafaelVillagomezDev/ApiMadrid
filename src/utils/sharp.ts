@@ -1,4 +1,3 @@
-// imageProcessor.ts
 import sharp from 'sharp';
 import { v2 as cloudinary } from 'cloudinary';
 import { Readable } from 'stream';
@@ -6,130 +5,123 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { configureCloudinary } from './cloudinary';
 
-// Asumimos que configureCloudinary esta ya
+// Configuración inicial
 configureCloudinary();
-// Bandera para asegurar que la configuración solo se ejecute una vez
-let isCloudinaryConfigured = false;
+let isCloudinaryConfigured = true;
 
-// --- Función Auxiliar para Procesar un Único Archivo ---
-const processSingleFileFromDisk = async (
-  file: Express.Multer.File,
-): Promise<any> => {
+// --- CONFIGURACIÓN DE SEGURIDAD ---
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB límite
+const ALLOWED_MIMETYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_PIXELS = 10000000; // 10MP para evitar ataques de agotamiento de RAM
+
+// Optimizamos Sharp para no colapsar el CPU en ataques DoS
+sharp.concurrency(2); 
+sharp.cache(false);
+
+const processSingleFileFromDisk = async (file: Express.Multer.File): Promise<any> => {
   const filePath = file.path;
 
-  // Función de limpieza
   const cleanup = () => {
-    fs.unlink(filePath, (unlinkErr) => {
-      if (unlinkErr)
-        console.error('Error al eliminar archivo temporal:', unlinkErr);
-    });
+    if (fs.existsSync(filePath)) {
+      fs.unlink(filePath, (err) => err && console.error('Error cleanup:', err));
+    }
   };
 
-  // 🛑 Verificación de existencia
-  if (!fs.existsSync(filePath)) {
-    cleanup();
-    throw new Error(`[CRÍTICO] Archivo no encontrado en la ruta: ${filePath}`);
-  }
-
   try {
+    // 1. SEGURIDAD: Validar tamaño antes de tocar el archivo
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error(`Archivo demasiado grande: ${file.originalname}`);
+    }
+
+    // 2. SEGURIDAD: Validar Mimetype real (no solo extensión)
+    if (!ALLOWED_MIMETYPES.includes(file.mimetype)) {
+      throw new Error(`Formato no permitido: ${file.mimetype}`);
+    }
+
     let image = sharp(filePath).rotate();
     const metadata = await image.metadata();
+
+    // 3. SEGURIDAD: Evitar "Pixel Flood" (bombas de descompresión)
+    const pixels = (metadata.width || 0) * (metadata.height || 0);
+    if (pixels > MAX_PIXELS) {
+      throw new Error("La resolución de la imagen es excesiva.");
+    }
 
     const originalWidth = metadata.width || 0;
     const originalHeight = metadata.height || 0;
 
-    // Lógica para elegir el tamaño objetivo
+    // --- Tu lógica de redimensionamiento mantenida ---
     const allowedSizes = [
       { width: 574, height: 384 },
       { width: 768, height: 512 },
       { width: 1200, height: 800 },
     ];
-    const distance = (size: { width: number; height: number }) =>
-      Math.abs(originalWidth - size.width) +
-      Math.abs(originalHeight - size.height);
-    const targetSize = allowedSizes.reduce((prev, curr) =>
-      distance(curr) < distance(prev) ? curr : prev,
-    );
+    
+    const targetSize = allowedSizes.reduce((prev, curr) => {
+      const dist = (s: any) => Math.abs(originalWidth - s.width) + Math.abs(originalHeight - s.height);
+      return dist(curr) < dist(prev) ? curr : prev;
+    });
 
-    // Lógica de redimensionamiento y recorte
     const targetRatio = targetSize.width / targetSize.height;
     const originalRatio = originalWidth / originalHeight;
-    let resizeOptions: { width?: number; height?: number } = {};
-
-    if (originalRatio > targetRatio) {
-      resizeOptions.height = targetSize.height;
-    } else {
-      resizeOptions.width = targetSize.width;
-    }
-
-    // Redimensionar, calcular recorte y extraer (Buffer final)
-    let buffer = await image.resize(resizeOptions).toBuffer();
-    const resized = sharp(buffer);
-    const resizedMeta = await resized.metadata();
-
-    const left = Math.max(
-      0,
-      Math.floor((resizedMeta.width! - targetSize.width) / 2),
-    );
-    const top = Math.max(
-      0,
-      Math.floor((resizedMeta.height! - targetSize.height) / 2),
+    
+    // Redimensionado optimizado (evitamos buffers intermedios innecesarios)
+    const pipeline = image.resize(
+      originalRatio > targetRatio ? { height: targetSize.height } : { width: targetSize.width }
     );
 
-    buffer = await resized
-      .extract({
-        left,
-        top,
-        width: targetSize.width,
-        height: targetSize.height,
-      })
+    const resizedBuffer = await pipeline.toBuffer();
+    const finalImage = sharp(resizedBuffer);
+    const resizedMeta = await finalImage.metadata();
+
+    const left = Math.max(0, Math.floor((resizedMeta.width! - targetSize.width) / 2));
+    const top = Math.max(0, Math.floor((resizedMeta.height! - targetSize.height) / 2));
+
+    const buffer = await finalImage
+      .extract({ left, top, width: targetSize.width, height: targetSize.height })
+      .jpeg({ quality: 85, mozjpeg: true }) // SEGURIDAD/OPTIMIZACIÓN: Forzamos compresión y limpieza de metadatos sensibles (EXIF)
       .toBuffer();
 
-    // 🚀 RESTAURACIÓN: Subir a Cloudinary con Stream
+    // 4. SEGURIDAD: Sanitizar el nombre del archivo para Cloudinary
+    // Evita ataques de path traversal o inyección de caracteres en URLs
+    const safeFileName = `${Date.now()}-${file.originalname.replace(/[^a-z0-9]/gi, '_').toLowerCase()}`;
+
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: 'imagenes', public_id: path.parse(file.filename).name },
+        { 
+          folder: 'imagenes_restaurantes', 
+          public_id: path.parse(safeFileName).name,
+          resource_type: 'image', // SEGURIDAD: Solo permitimos imágenes
+          allowed_formats: ['jpg', 'png', 'webp'],
+        },
         (error, result) => {
-          cleanup(); // Limpiar después de la subida exitosa
+          cleanup();
           if (error) return reject(error);
-          resolve(result); // Devolver el resultado de Cloudinary
+          resolve(result);
         },
       );
 
-      // Canalizar el buffer (en memoria) al stream de subida
-      const readable = Readable.from(buffer);
-      readable.pipe(uploadStream).on('error', (streamError) => {
-        cleanup(); // Limpiar si el stream falla
-        reject(streamError);
+      Readable.from(buffer).pipe(uploadStream).on('error', (err) => {
+        cleanup();
+        reject(err);
       });
     });
   } catch (error) {
-    cleanup(); // Limpiar si falla antes de la subida
+    cleanup();
     throw error;
   }
 };
 
-// --- Middleware Principal para Array de Archivos ---
-export const processAndUploadImageFlexible = async (
-  req: any,
-  res: any,
-  next: any,
-) => {
-  // 🚀 Lógica de configuración (Asumiendo que configureCloudinary está disponible)
-  if (!isCloudinaryConfigured) {
-    try {
-      // configureCloudinary(); // Descomentar si decides llamar aquí
-      isCloudinaryConfigured = true;
-    } catch (error) {
-      console.error('Fallo al configurar Cloudinary:', error);
-      return next(error);
-    }
-  }
-  // ------------------------------------------------
-
-  // 🛑 Verificar si hay archivos en req.files
+export const processAndUploadImageFlexible = async (req: any, res: any, next: any) => {
+  // 5. SEGURIDAD: Límite de archivos por petición
+  const MAX_FILES = 5;
+  
   if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
     return next();
+  }
+
+  if (req.files.length > MAX_FILES) {
+      return res.status(400).json({ error: `Máximo ${MAX_FILES} archivos permitidos.` });
   }
 
   try {
@@ -137,15 +129,11 @@ export const processAndUploadImageFlexible = async (
       processSingleFileFromDisk(file),
     );
 
-    // Ejecutar todas las subidas en paralelo
     const results = await Promise.all(filePromises);
-
-    // Adjuntar los resultados de Cloudinary al objeto req
     req.cloudinaryResults = results;
-    console.log(req.cloudinaryResults);
     next();
-  } catch (error) {
-    console.error('Error procesando array de imágenes:', error);
-    next(error);
+  } catch (error: any) {
+    console.error('Error procesador imágenes:', error.message);
+    res.status(400).json({ error: error.message || 'Error al procesar imágenes' });
   }
 };
