@@ -3,7 +3,6 @@ import { Request, Response, NextFunction } from 'express';
 import { matchedData, validationResult } from 'express-validator';
 import {
   RestaurantInterface,
-  RestaurantQueryInterface,
   RestaurantQueryPagination,
   RestaurantRemoveQueryInterface,
 } from 'restaurant-type';
