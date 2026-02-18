@@ -87,16 +87,17 @@ class Restaurant implements RestaurantInterface {
 
 
   async getRestaurants(obj: RestaurantQueryPagination) {
-    const { id, name, address, limit, offset } = obj;
+    const { id, name, address,type_food, limit, offset } = obj;
     const [queryRestaurants, values] = getRestaurantData({
       id,
       name,
       address,
+      type_food,
       limit,
       offset,
     });
 
-    const [queryCount, countValues] = countTotalRestaurants({ id, name, address });
+    const [queryCount, countValues] = countTotalRestaurants({ id, name,address,type_food });
 
     const [[rows], [countRows]]: [any[], any] = await Promise.all([
       promisePool.query(queryRestaurants, values),

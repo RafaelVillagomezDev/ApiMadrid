@@ -31,6 +31,7 @@ interface RestaurantQueryPagination {
   id?: string;
   name?: string;
   address?: string;
+  type_food?: string;
   limit?: number;
   offset?: number;
 }

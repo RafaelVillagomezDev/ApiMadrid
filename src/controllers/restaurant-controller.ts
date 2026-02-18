@@ -101,6 +101,7 @@ const RestaurantController = {
         name: validData.name,
         id: validData.id,
         address: validData.address,
+        type_food:validData.type_food,
         limit: validData.limit,
         offset: validData.offset,
       };

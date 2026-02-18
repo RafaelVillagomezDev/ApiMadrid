@@ -73,5 +73,41 @@ const LocationSchema = {
             },
         },
     }),
+    get: (0, express_validator_1.checkSchema)({
+        relatedType: {
+            in: ['params'],
+            exists: {
+                options: {
+                    checkNull: true,
+                    checkFalsy: true,
+                },
+                errorMessage: 'El tipo relacionado es obligatorio',
+            },
+            isLength: {
+                options: { max: 30 },
+                errorMessage: 'El tipo debe tener máximo 30 caracteres',
+            },
+            custom: {
+                options: validateRelatedType,
+            },
+        },
+        relatedId: {
+            in: ['params'],
+            isUUID: {
+                errorMessage: 'Id debe ser un UUID válido',
+            },
+            custom: {
+                options: (value) => __awaiter(void 0, void 0, void 0, function* () {
+                    const [rows] = yield promisePool.query((0, restaurant_query_1.isRestaurant)(), [
+                        value,
+                    ]);
+                    if (rows.length === 0) {
+                        throw new Error('No existe un restaurante con ese ID en la base de datos');
+                    }
+                    return true;
+                }),
+            },
+        },
+    }),
 };
 exports.LocationSchema = LocationSchema;

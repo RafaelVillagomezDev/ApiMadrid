@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createLocation = exports.existLocation = void 0;
+exports.getLocation = exports.createLocation = exports.existLocation = void 0;
 const existLocation = () => {
     const query = 'SELECT * FROM `location` WHERE `relatedId` = ?;';
     return query;
@@ -11,3 +11,10 @@ const createLocation = () => {
     return query;
 };
 exports.createLocation = createLocation;
+const getLocation = () => {
+    const query = `SELECT *
+  FROM location WHERE relatedId = ? 
+   `;
+    return query;
+};
+exports.getLocation = getLocation;

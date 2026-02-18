@@ -14,8 +14,7 @@ const isRestaurant = (): string => {
   return query;
 };
 
-
-const countTotalRestaurants = ({ id, name, address }: any): [string, any[]] => {
+const countTotalRestaurants = ({ id, name, address, type_food }: any): [string, any[]] => {
   const conditions: string[] = [];
   const filterValues: any[] = [];
 
@@ -31,18 +30,24 @@ const countTotalRestaurants = ({ id, name, address }: any): [string, any[]] => {
     conditions.push(`address LIKE ?`);
     filterValues.push(`%${address}%`);
   }
+  if (type_food) {
+    // Coherencia con la query principal
+    conditions.push(`LOWER(type_food) = LOWER(?)`);
+    filterValues.push(type_food.trim());
+  }
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-  
-  // Usamos COUNT(*) en MySQL
   const query = `SELECT COUNT(*) AS total FROM restaurant ${whereClause};`;
 
   return [query, filterValues];
 };
+
+
 const getRestaurantData = ({
   id,
   name,
   address,
+  type_food,
   limit,
   offset,
 }: any): [string, any[]] => {
@@ -64,17 +69,16 @@ const getRestaurantData = ({
     filterValues.push(`%${address}%`);
   }
 
-  const whereClause =
-    conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+  if (type_food) {
 
-  // 🔒 Conversión segura
-  const safeLimit =
-    Number.isInteger(Number(limit)) && Number(limit) >= 0 ? Number(limit) : 10;
+    conditions.push(`LOWER(type_food) = LOWER(?)`);
+    filterValues.push(type_food.trim());
+  }
 
-  const safeOffset =
-    Number.isInteger(Number(offset)) && Number(offset) >= 0
-      ? Number(offset)
-      : 0;
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  const safeLimit = Math.max(0, parseInt(limit) || 10);
+  const safeOffset = Math.max(0, parseInt(offset) || 0);
 
   const query = `
     SELECT 
@@ -117,7 +121,7 @@ const getRestaurantData = ({
     ORDER BY r.id ASC, menu.id ASC, dishes.id ASC;
   `;
 
-  // ⚠ IMPORTANTE: offset primero, luego limit
+  // ⚠ EL ORDEN ES: ...filtros, offset, limit
   const values = [...filterValues, safeOffset, safeLimit];
 
   return [query.trim(), values];

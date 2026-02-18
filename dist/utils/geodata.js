@@ -18,9 +18,6 @@ const getCoords = (address) => {
                 };
                 resolve(geoData);
             }
-            else {
-                reject(new Error('No se encontraron coordenadas'));
-            }
         })
             .catch((error) => {
             reject(error);

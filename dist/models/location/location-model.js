@@ -17,7 +17,7 @@ const promisePool = bd_1.pool.promise();
 class Location {
     constructor({ relatedId, id, latitude, longitude, address, country, county, town, relatedType, }) {
         this.relatedId = relatedId;
-        this.id = id;
+        this.id = id !== null && id !== void 0 ? id : '';
         this.latitude = latitude;
         this.longitude = longitude;
         this.address = address;
@@ -60,6 +60,18 @@ class Location {
                 throw new Error('No se pudo crear el restaurante ');
             }
             return result.affectedRows;
+        });
+    }
+    getLocation() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const queryGet = (0, location_query_1.getLocation)();
+            const [rows] = yield promisePool.query(queryGet, [
+                this.relatedId,
+            ]);
+            if (rows.length === 0) {
+                throw new Error('No existe ese restaurante en nuestra bbdd');
+            }
+            return rows;
         });
     }
 }

@@ -31,7 +31,7 @@ class Image {
                     this.id,
                     this.relatedId,
                     this.relatedType,
-                    JSON.stringify(this.url),
+                    this.url,
                 ]);
                 if (result.affectedRows === 0) {
                     throw new Error('No se pudo crear la imagen');

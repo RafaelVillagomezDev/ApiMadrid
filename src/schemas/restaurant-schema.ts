@@ -178,6 +178,17 @@ const RestaurantSchema = {
           'La dirección debe tener al menos 4 caracteres alfanuméricos',
       },
     },
+    type_food: {
+      in: ['query'],
+       optional: true,
+      errorMessage: 'Tipo de comida invalido',
+      trim: true,
+      escape: true,
+      isIn: {
+        options: [['española', 'japonesa', 'china', 'turca']],
+        errorMessage: 'Tipo de comida no válido. Debe ser: española, japonesa, china o turca',
+      },
+    },
     limit: {
       in: ['query'],
       optional: true,
