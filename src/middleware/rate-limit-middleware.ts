@@ -6,7 +6,7 @@ import { addToken } from '../models/blacklist/blacklist-model';
 
 export const apiLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 120,
+  max: 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: {

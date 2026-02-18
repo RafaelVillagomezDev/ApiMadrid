@@ -8,4 +8,5 @@ const location_schema_1 = require("../../schemas/location-schema");
 const location_controller_1 = __importDefault(require("../../controllers/location-controller"));
 const router = express_1.default.Router();
 router.post('/create/:relatedType/:relatedId', location_schema_1.LocationSchema.create, location_controller_1.default.createLocation);
+router.get('/:relatedType/:relatedId', location_schema_1.LocationSchema.get, location_controller_1.default.getLocation);
 exports.default = router;

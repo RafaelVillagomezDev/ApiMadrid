@@ -50,5 +50,41 @@ const LocationController = {
             next(error);
         }
     }),
+    getLocation: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const errors = (0, express_validator_1.validationResult)(req);
+            const errorResponse = {
+                message: 'Error en validación',
+                data: errors.array(),
+                code: 400,
+            };
+            if (!errors.isEmpty()) {
+                res.status(400).json(errorResponse);
+                return;
+            }
+            const validData = (0, express_validator_1.matchedData)(req);
+            const location = {
+                relatedId: validData.relatedId,
+                relatedType: validData.relatedType,
+                address: validData.address,
+                latitude: validData.latitud,
+                longitude: validData.longitud,
+                country: validData.country,
+                town: validData.town,
+                county: validData.county,
+            };
+            const data = yield location_factory_1.LocationFactory.getLocation(location);
+            const response = {
+                message: 'Restaurante obtenido con éxito',
+                data: data,
+                code: 200,
+                count: 1,
+            };
+            res.status(200).send(response);
+        }
+        catch (error) {
+            next(error);
+        }
+    }),
 };
 exports.default = LocationController;

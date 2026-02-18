@@ -20,5 +20,20 @@ class RestaurantFactory {
             return rows;
         });
     }
+    static getRestaurant(obj) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const restaurant = new restaurant_model_1.Restaurant(obj);
+            const rows = yield restaurant.getRestaurants(restaurant);
+            return rows;
+        });
+    }
+    static removeRestaurant(obj) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const restaurant = new restaurant_model_1.Restaurant(obj);
+            yield restaurant.existRestaurant();
+            const rows = yield restaurant.removeRestaurants();
+            return rows;
+        });
+    }
 }
 exports.RestaurantFactory = RestaurantFactory;

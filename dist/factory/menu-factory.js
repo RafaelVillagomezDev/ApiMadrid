@@ -9,23 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LocationFactory = void 0;
-const location_model_1 = require("../models/location/location-model");
-class LocationFactory {
-    static createLocation(obj) {
+exports.MenuFactory = void 0;
+const menu_model_1 = require("../models/menu/menu-model");
+class MenuFactory {
+    static createMenu(obj) {
         return __awaiter(this, void 0, void 0, function* () {
-            const location = new location_model_1.Location(obj);
-            yield location.existLocation();
-            const rows = yield location.createLocation();
-            return rows;
-        });
-    }
-    static getLocation(obj) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const location = new location_model_1.Location(obj);
-            const rows = yield location.getLocation();
+            const menu = new menu_model_1.Menu(obj);
+            const rows = yield menu.createMenu();
             return rows;
         });
     }
 }
-exports.LocationFactory = LocationFactory;
+exports.MenuFactory = MenuFactory;
