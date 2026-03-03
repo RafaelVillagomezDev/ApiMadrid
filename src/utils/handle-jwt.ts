@@ -1,9 +1,12 @@
 import jsonwebtoken from 'jsonwebtoken';
 import { JWTPayload, UserData } from 'jwt-type';
 
-const SECRET_TOKEN = process.env.JWT_SECRET;
+
 
 export const tokenSign = async ({ id_user, email, rol, jti }: UserData) => {
+  //La leemos dentro para que se ejecute en el momento en el que se llama la funcion 
+  const SECRET_TOKEN = process.env.JWT_SECRET;
+
   if (!SECRET_TOKEN) {
     throw new Error('JWT_SECRET no está definido en las variables de entorno.');
   }
@@ -26,6 +29,7 @@ export const tokenSign = async ({ id_user, email, rol, jti }: UserData) => {
 export const verifyToken = async (
   token: string,
 ): Promise<JWTPayload | null> => {
+  const SECRET_TOKEN = process.env.JWT_SECRET;
   if (!SECRET_TOKEN) {
     throw new Error('JWT_SECRET no está definido en las variables de entorno.');
   }

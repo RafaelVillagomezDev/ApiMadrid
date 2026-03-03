@@ -44,7 +44,7 @@ const MenuSchema = {
         errorMessage: 'El nombre del plato debe tener entre 3 y 50 caracteres',
       },
       matches: {
-        options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,()]+$/,
+        options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,()\-]+$/,
         errorMessage: 'El nombre del plato contiene caracteres inválidos',
       },
     },
