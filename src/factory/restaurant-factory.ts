@@ -2,7 +2,7 @@ import { RestaurantInterface } from 'restaurant-type';
 import { Restaurant } from '../models/restaurant/restaurant-model';
 
 class RestaurantFactory {
-  static async createRestaurant(obj: RestaurantInterface) {
+  static async createRestaurant(obj: RestaurantInterface):Promise<number> {
     const restaurant = new Restaurant(obj);
     await restaurant.existRestaurant();
     const rows = await restaurant.createRestaurant();

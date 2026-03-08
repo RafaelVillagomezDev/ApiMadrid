@@ -3,7 +3,7 @@ interface RestaurantInterface {
   name?: string;
   address?: string;
   email?: string;
-  description?: Text;
+  description?: string;
   phone?: string;
   type_food?: string;
   web?: string;

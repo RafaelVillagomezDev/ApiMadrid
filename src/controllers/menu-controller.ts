@@ -40,7 +40,7 @@ const MenuController = {
         message: 'Menú creado con éxito',
         code: 200,
       };
-
+      
       res.status(200).json(response);
     } catch (error) {
       next(error);
