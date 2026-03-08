@@ -52,10 +52,10 @@ class Menu implements MenuInterface {
 
       await conn.commit();
       return menuResult.affectedRows;
-    } catch (err) {
+    } catch (err: unknown) {
       await conn.rollback();
-
-      throw new Error('Error al crear el menú:');
+      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      throw new Error(`Error al crear el menú: ${errorMessage}`);
     } finally {
       conn.release();
     }

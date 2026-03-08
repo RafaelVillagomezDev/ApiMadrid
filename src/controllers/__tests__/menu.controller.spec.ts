@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { beforeEach, describe, test, vi, expect } from 'vitest';
-import { menu } from '../factories/menu.factory';
+import { menu } from './factories/menu.factory';
 import { validationResult } from 'express-validator';
 import { MenuSchema } from '../../schemas/menu-schema';
 import { MenuFactory } from '../../factory/menu-factory';
@@ -34,7 +34,7 @@ describe('Test para Menu Controller', () => {
         next = vi.fn();
     });
 
-    test('Creacion objeto menu y validacion mediante schema', async () => {
+    test('Validamos todas las reglas de validaciones de nuestro Schema', async () => {
 
         vi.clearAllMocks(); //limpiamos
 
@@ -63,20 +63,55 @@ describe('Test para Menu Controller', () => {
         // 5. Asertamos según lo que esperes (éxito en este caso)
         expect(errors.isEmpty()).toBe(true);
 
-    })
-    test('Creacion de objeto menu y comprobacion', async () => {
-        const menuFake = menu;
-        req.body = menuFake;
+    });
 
-        vi.mocked(MenuFactory.createMenu).mockResolvedValue(menuFake as any);
+    // Necesitamos crear BBDD de prueba para testing , o de lo contrario seguira fallando nuestros menu
+    test.skip('Creacion de objeto menu y comprobacion (LOGICA REAL)', async () => {
+
+        /* TIP
+            Usas mockImplementation cuando quieres reprogramar una función que otro código va a llamar. 
+            Usas importActual a secas cuando tú quieres usar la función original como una herramienta dentro de tu archivo de test.
+        */
+
+        // Extraemos la lógica real del archivo original
+        const actualModule = await vi.importActual('../../factory/menu-factory') as any;
+        const nextMock = vi.mocked(next);
+        // Inyectamos esa lógica real en el mock para este test específico
+        vi.mocked(MenuFactory.createMenu).mockImplementation(actualModule.MenuFactory.createMenu);
+
+        // Cargamos los datos del body
+        req.body = menu;
+
+
+        // Ejecutamos el Schema de express-validator (imprescindible si el controlador lo chequea)
+        await Promise.all(
+            MenuSchema.create.map((validation: any) => validation.run(req))
+        );
+
 
         await MenuController.createMenu(req as Request, res as Response, next);
 
-        // FIX: Asegúrate de pasar un número aquí, no el objeto
+
+
+        if (nextMock.mock.calls.length > 0) {
+            const errorDetectado = nextMock.mock.calls[0][0];
+            console.error('❌ EL CONTROLADOR ENVIÓ UN ERROR A NEXT():');
+            console.error(errorDetectado); // Aquí verás si es un error de Base de Datos, etc.
+
+            // Forzamos el fallo del test con el mensaje descriptivo
+            throw new Error(`Fallo en lógica real: ${errorDetectado}`);
+        }
+
+
+        // Verificamos el status 200
         expect(res.status).toHaveBeenCalledWith(200);
-        // Aquí comparamos con lo que RECIBIMOS en el error anterior (el objeto con message)
+
+        // Verificamos el contenido del JSON
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
             message: 'Menú creado con éxito'
         }));
+
+        // Log opcional para ver qué devolvió exactamente la Factory real
+        console.log('✅ Respuesta exitosa recibida:', (res.json as any).mock.calls[0][0]);
     });
 })
