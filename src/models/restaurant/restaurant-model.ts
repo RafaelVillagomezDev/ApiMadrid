@@ -20,7 +20,7 @@ class Restaurant implements RestaurantInterface {
   email?: string;
   name?: string;
   address?: string;
-  description?: Text;
+  description?: string | Text;
   phone?: string;
   type_food?: string;
   web?: string;
