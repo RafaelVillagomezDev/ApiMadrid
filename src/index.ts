@@ -16,20 +16,27 @@ import { csrfProtection, initCookieParser } from './auth/auth-csrf';
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 const app: Application = express();
 
+const whitelist = ['http://localhost:3000','http://localhost:5173'];
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      callback(null, origin);
+      // 1. Permitir peticiones sin origen (como Postman o curl) 
+      // 2. O si el origen está en la lista blanca
+      if (!origin || whitelist.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('No permitido por CORS'));
+      }
     },
 
-    // 2. Permite el intercambio de cookies (vital para CSRF y Sesiones)
+    // Permite el intercambio de cookies
     credentials: true,
 
-    // 3. Métodos permitidos
+    // Métodos permitidos
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 
-    // 4. Headers permitidos (añadimos x-csrf-token)
+    // Headers permitidos
     allowedHeaders: [
       'Content-Type',
       'Authorization',
@@ -39,7 +46,6 @@ app.use(
     ],
   }),
 );
-
 // Responder explícitamente a OPTIONS antes que a otros middlewares
 app.options('*', cors());
 app.use(express.json());
