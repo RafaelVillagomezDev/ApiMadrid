@@ -1,4 +1,4 @@
-import { LocationInterface } from 'location-type';
+import { LocationInterface } from '../types/location-type';
 import { Location } from '../models/location/location-model';
 
 class LocationFactory {

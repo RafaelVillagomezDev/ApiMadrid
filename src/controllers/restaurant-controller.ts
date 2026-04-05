@@ -1,15 +1,15 @@
-import { ApiResponseInterface } from 'api-type';
+import { ApiResponseInterface } from '../types/api-type';
 import { Request, Response, NextFunction } from 'express';
 import { matchedData, validationResult } from 'express-validator';
 import {
   RestaurantInterface,
   RestaurantQueryPagination,
   RestaurantRemoveQueryInterface,
-} from 'restaurant-type';
+} from '../types/restaurant-type';
 import { RestaurantFactory } from '../factory/restaurant-factory';
 import { v4 as uuidv4 } from 'uuid';
 import { getCoords } from '../utils/geodata';
-import { LocationInterface } from 'location-type';
+import { LocationInterface } from '../types/location-type';
 import { LocationFactory } from '../factory/location-factory';
 
 const RestaurantController = {

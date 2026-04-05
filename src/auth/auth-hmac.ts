@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponseInterface } from 'api-type';
+import { ApiResponseInterface } from '../types/api-type';
 
 // --- CONFIGURACIÓN Y CONSTANTES ---
 const SHARED_SECRET_KEY: string = process.env.HMAC_SECRET as string;

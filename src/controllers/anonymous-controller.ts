@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { tokenSign } from '../utils/handle-jwt';
-import { ApiResponseInterface } from 'api-type.js';
-import { UserData } from 'jwt-type.js';
+import { ApiResponseInterface } from '../types/api-type';
+import { UserData } from '../types/jwt-type';
 import crypto from 'crypto'; // Módulo nativo para generar IDs únicos
 
 const AnonymusController = {

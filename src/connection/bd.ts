@@ -1,5 +1,5 @@
 import mysql from 'mysql2';
-import { BdInterface } from 'bd-type';
+import { BdInterface } from '../types/bd-type';
 import dotenv from 'dotenv';
 import path from 'path';
 

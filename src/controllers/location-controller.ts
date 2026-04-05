@@ -1,7 +1,7 @@
-import { ApiResponseInterface } from 'api-type';
+import { ApiResponseInterface } from '../types/api-type';
 import { Request, Response, NextFunction } from 'express';
 import { matchedData, validationResult } from 'express-validator';
-import { LocationInterface } from 'location-type';
+import { LocationInterface } from '../types/location-type';
 import { LocationFactory } from '../factory/location-factory';
 
 import { v4 as uuidv4 } from 'uuid';

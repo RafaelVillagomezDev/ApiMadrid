@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import AnonymusController from '../../controllers/anonymous-controller';
 import { tokenSign } from '../../utils/handle-jwt';
 import { faker } from '@faker-js/faker';
-import { UserData } from 'jwt-type';
+import { UserData } from '../../types/jwt-type';
 import jsonwebtoken from 'jsonwebtoken';
 
 // 2. CORRECCIÓN DE RUTA: Debe coincidir exactamente con el import de arriba

@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { MenuInterface } from 'menu-types';
+import { MenuInterface } from '../../../types/menu-types';
 
 /**
  * Importante necesitamos crear una BBDD para testing si no esto seguira fallando

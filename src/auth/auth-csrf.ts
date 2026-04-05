@@ -1,7 +1,7 @@
 import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponseInterface } from 'api-type';
+import { ApiResponseInterface } from '../types/api-type';
 
 // Configuración de la clave secreta y nombres
 const COOKIE_SECRET: string = process.env.COOKIE_SECRET as string;

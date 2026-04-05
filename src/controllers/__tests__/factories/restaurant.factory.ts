@@ -1,5 +1,5 @@
 import { fakerES as faker } from '@faker-js/faker';
-import { RestaurantInterface } from "restaurant-type";
+import { RestaurantInterface } from "../../../types/restaurant-type";
 
 
 export const restaurantFake: RestaurantInterface = {

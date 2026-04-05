@@ -1,4 +1,4 @@
-import { RestaurantQueryPagination } from 'restaurant-type';
+
 
 const createRestaurant = (): string => {
   const query = `INSERT IGNORE INTO RESTAURANT (id,email,name,address,description,phone,type_food,web) VALUES (?, ?, ?, ?,?,?,?,?);`;

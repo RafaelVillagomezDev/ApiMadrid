@@ -1,4 +1,4 @@
-import { CloudImageUpload, ImageInterface } from 'image-type';
+import { CloudImageUpload, ImageInterface } from '../types/image-type';
 import { Image } from '../models/image/image-model';
 
 class ImageFactory {
