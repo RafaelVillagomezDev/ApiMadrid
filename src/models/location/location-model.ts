@@ -1,4 +1,4 @@
-import { LocationInterface } from 'location-type';
+import { LocationInterface } from '../../types/location-type';
 import { pool } from '../../connection/bd';
 import { ResultSetHeader } from 'mysql2';
 import {

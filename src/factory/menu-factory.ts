@@ -1,4 +1,4 @@
-import { MenuInterface } from 'menu-types';
+import { MenuInterface } from '../types/menu-types';
 import { Menu } from '../models/menu/menu-model';
 
 class MenuFactory {

@@ -1,6 +1,6 @@
 import { verifyToken } from '../utils/handle-jwt';
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponseInterface } from 'api-type';
+import { ApiResponseInterface } from '../types/api-type';
 /*
   Middleware: función que verifica la autenticidad del token (Authorization: Bearer <token>)
   y adjunta el payload del usuario a la petición si es válido.

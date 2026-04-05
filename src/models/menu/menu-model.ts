@@ -1,6 +1,6 @@
 import { createDishes, createMenu } from '../../queries/menu-query';
 import { pool } from '../../connection/bd';
-import { DishInterface, MenuInterface } from 'menu-types';
+import { DishInterface, MenuInterface } from '../../types/menu-types';
 import { ResultSetHeader } from 'mysql2';
 import { v4 as uuidv4 } from 'uuid';
 

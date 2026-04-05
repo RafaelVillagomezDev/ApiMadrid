@@ -1,4 +1,4 @@
-import { ImageInterface } from 'image-type';
+import { ImageInterface } from '../../types/image-type';
 import { pool } from '../../connection/bd';
 import { ResultSetHeader } from 'mysql2';
 import { existImage, createImage } from '../../queries/image-query';

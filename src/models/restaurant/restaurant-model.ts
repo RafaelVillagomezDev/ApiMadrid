@@ -1,7 +1,7 @@
 import {
   RestaurantInterface,
   RestaurantQueryPagination,
-} from 'restaurant-type';
+} from '../../types/restaurant-type';
 import {
   countTotalRestaurants,
   createRestaurant,

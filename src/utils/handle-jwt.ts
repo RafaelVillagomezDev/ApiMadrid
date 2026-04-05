@@ -1,5 +1,5 @@
 import jsonwebtoken from 'jsonwebtoken';
-import { JWTPayload, UserData } from 'jwt-type';
+import { JWTPayload, UserData } from '../types/jwt-type';
 
 
 

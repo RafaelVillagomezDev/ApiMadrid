@@ -1,8 +1,8 @@
-import { ApiResponseInterface } from 'api-type';
+import { ApiResponseInterface } from '../types/api-type';
 import { Request, Response, NextFunction } from 'express';
 import { matchedData, validationResult } from 'express-validator';
 import { v4 as uuidv4 } from 'uuid';
-import { MenuInterface } from 'menu-types';
+import { MenuInterface } from '../types/menu-types';
 import { MenuFactory } from '../factory/menu-factory';
 
 const MenuController = {

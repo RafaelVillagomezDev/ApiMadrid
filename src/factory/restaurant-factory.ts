@@ -1,4 +1,4 @@
-import { RestaurantInterface } from 'restaurant-type';
+import { RestaurantInterface } from '../types/restaurant-type';
 import { Restaurant } from '../models/restaurant/restaurant-model';
 
 class RestaurantFactory {
