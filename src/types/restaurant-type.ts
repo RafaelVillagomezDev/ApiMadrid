@@ -5,7 +5,7 @@ interface RestaurantInterface {
   email?: string;
   description?: string | Text;
   phone?: string;
-  type_food?: string;
+  type_food?: string[];
   web?: string;
   [key: string]: any;
   limit?: number;
@@ -31,7 +31,7 @@ interface RestaurantQueryPagination {
   id?: string;
   name?: string;
   address?: string;
-  type_food?: string;
+  type_food?: string[];
   limit?: number;
   offset?: number;
 }

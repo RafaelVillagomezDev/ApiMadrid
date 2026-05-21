@@ -22,7 +22,7 @@ class Restaurant implements RestaurantInterface {
   address?: string;
   description?: string | Text;
   phone?: string;
-  type_food?: string;
+  type_food?: string[];
   web?: string;
   limit?: number | undefined;
   offset?: number | undefined;
