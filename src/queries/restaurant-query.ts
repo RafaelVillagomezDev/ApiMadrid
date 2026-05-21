@@ -14,42 +14,12 @@ const isRestaurant = (): string => {
   return query;
 };
 
-const countTotalRestaurants = ({ id, name, address, type_food }: any): [string, any[]] => {
-  const conditions: string[] = [];
-  const filterValues: any[] = [];
 
-  if (id) {
-    conditions.push(`id = ?`);
-    filterValues.push(id);
-  }
-  if (name) {
-    conditions.push(`name LIKE ?`);
-    filterValues.push(`%${name}%`);
-  }
-  if (address) {
-    conditions.push(`address LIKE ?`);
-    filterValues.push(`%${address}%`);
-  }
-  if (type_food) {
-    // Coherencia con la query principal
-    conditions.push(`LOWER(type_food) = LOWER(?)`);
-    filterValues.push(type_food.trim());
-  }
-
-  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-  const query = `SELECT COUNT(*) AS total FROM restaurant ${whereClause};`;
-
-  return [query, filterValues];
-};
-
-
-const getRestaurantData = ({
+const countTotalRestaurants = ({
   id,
   name,
   address,
-  type_food,
-  limit,
-  offset,
+  type_food, 
 }: any): [string, any[]] => {
   const conditions: string[] = [];
   const filterValues: any[] = [];
@@ -69,14 +39,82 @@ const getRestaurantData = ({
     filterValues.push(`%${address}%`);
   }
 
-  if (type_food) {
 
-    conditions.push(`LOWER(type_food) = LOWER(?)`);
-    filterValues.push(type_food.trim());
+  if (type_food) {
+    const foodArray = Array.isArray(type_food) 
+      ? type_food.filter(t => t !== null && t !== undefined && String(t).trim() !== "")
+      : [type_food].filter(t => t !== null && t !== undefined && String(t).trim() !== "");
+
+    if (foodArray.length > 0) {
+      const placeholders = foodArray.map(() => 'LOWER(?)').join(', ');
+      conditions.push(`LOWER(type_food) IN (${placeholders})`);
+      
+
+      foodArray.forEach(t => filterValues.push(String(t).trim().toLowerCase()));
+    }
   }
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
+  const query = `
+    SELECT COUNT(DISTINCT id) AS total 
+    FROM restaurant 
+    ${whereClause};
+  `;
+
+  return [query.trim(), filterValues];
+};
+
+
+const getRestaurantData = ({
+  id,
+  name,
+  address,
+  type_food, 
+  limit,
+  offset,
+}: any): [string, any[]] => {
+  const conditions: string[] = [];
+  const filterValues: any[] = [];
+
+  // 1. Filtro por ID
+  if (id) {
+    conditions.push(`id = ?`);
+    filterValues.push(id);
+  }
+
+  // 2. Filtro por Nombre
+  if (name) {
+    conditions.push(`name LIKE ?`);
+    filterValues.push(`%${name}%`);
+  }
+
+  //  Filtro por Dirección (Address)
+  if (address) {
+    conditions.push(`address LIKE ?`);
+    filterValues.push(`%${address}%`);
+  }
+
+  //  Filtro Múltiple por Tipo de Comida (Países) -> Uso de IN
+  if (type_food) {
+    
+    const foodArray = Array.isArray(type_food) 
+      ? type_food.filter(t => t && String(t).trim() !== "")
+      : [type_food].filter(t => t && String(t).trim() !== "");
+
+    if (foodArray.length > 0) {
+   
+      const placeholders = foodArray.map(() => 'LOWER(?)').join(', ');
+      conditions.push(`LOWER(type_food) IN (${placeholders})`);
+  
+      foodArray.forEach(t => filterValues.push(String(t).trim().toLowerCase()));
+    }
+  }
+
+  // Construcción de la cláusula WHERE uniendo todo con AND
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  // Paginación segura
   const safeLimit = Math.max(0, parseInt(limit) || 10);
   const safeOffset = Math.max(0, parseInt(offset) || 0);
 
@@ -121,16 +159,17 @@ const getRestaurantData = ({
     ORDER BY r.id ASC, menu.id ASC, dishes.id ASC;
   `;
 
-  // ⚠ EL ORDEN ES: ...filtros, offset, limit
+  // El orden de los marcadores en los drivers SQL: primero filtros dinámicos, luego offset y limit
   const values = [...filterValues, safeOffset, safeLimit];
 
   return [query.trim(), values];
 };
 
-const formatRestaurantData = (rows: any[]) => {
+const formatRestaurantData = (rows: any[]): any[] => {
   const restaurantsMap = new Map();
 
   for (const row of rows) {
+
     if (!restaurantsMap.has(row.restaurant_id)) {
       restaurantsMap.set(row.restaurant_id, {
         id: row.restaurant_id,
@@ -141,7 +180,7 @@ const formatRestaurantData = (rows: any[]) => {
         phone: row.restaurant_phone,
         type_food: row.restaurant_type_food,
         web: row.restaurant_web,
-        images: row.image_id ? [{ id: row.image_id, url: row.image_url }] : [],
+        images: [],
         location: row.location_id
           ? {
               id: row.location_id,
@@ -158,40 +197,41 @@ const formatRestaurantData = (rows: any[]) => {
 
     const restaurant = restaurantsMap.get(row.restaurant_id);
 
-    // Agrupar imágenes (opcional si hay varias)
-    if (
-      row.image_id &&
-      !restaurant.images.find((img: any) => img.id === row.image_id)
-    ) {
-      restaurant.images.push({ id: row.image_id, url: row.image_url });
+    
+    if (row.image_id) {
+      const imageExists = restaurant.images.some((img: any) => img.id === row.image_id);
+      if (!imageExists) {
+        restaurant.images.push({ id: row.image_id, url: row.image_url });
+      }
     }
 
-    // Buscar si el menú ya está agregado
-    let menu = restaurant.menus.find((m: any) => m.id === row.menu_id);
+    
+    if (row.menu_id) {
+      let menu = restaurant.menus.find((m: any) => m.id === row.menu_id);
 
-    if (!menu && row.menu_id) {
-      menu = {
-        id: row.menu_id,
-        name: row.menu_name,
-        description: row.menu_description,
-        dishes: [],
-      };
-      restaurant.menus.push(menu);
-    }
+      if (!menu) {
+        menu = {
+          id: row.menu_id,
+          name: row.menu_name,
+          description: row.menu_description,
+          dishes: [],
+        };
+        restaurant.menus.push(menu);
+      }
 
-    // Agregar plato si existe
-    if (
-      menu &&
-      row.dish_id &&
-      !menu.dishes.find((d: any) => d.id === row.dish_id)
-    ) {
-      menu.dishes.push({
-        id: row.dish_id,
-        name: row.dish_name,
-        description: row.dish_description,
-        price: row.dish_price,
-        category: row.dish_category,
-      });
+      
+      if (row.dish_id) {
+        const dishExists = menu.dishes.some((d: any) => d.id === row.dish_id);
+        if (!dishExists) {
+          menu.dishes.push({
+            id: row.dish_id,
+            name: row.dish_name,
+            description: row.dish_description,
+            price: row.dish_price,
+            category: row.dish_category,
+          });
+        }
+      }
     }
   }
 

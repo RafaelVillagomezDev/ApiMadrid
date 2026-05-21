@@ -178,16 +178,33 @@ const RestaurantSchema = {
           'La dirección debe tener al menos 4 caracteres alfanuméricos',
       },
     },
-    type_food: {
+   type_food: {
       in: ['query'],
-       optional: true,
-      errorMessage: 'Tipo de comida invalido',
-      trim: true,
-      escape: true,
-      isIn: {
-        options: [['española', 'japonesa', 'china', 'turca']],
-        errorMessage: 'Tipo de comida no válido. Debe ser: española, japonesa, china o turca',
+      optional: true,
+      errorMessage: 'Tipo de comida inválido',
+     
+      customSanitizer: {
+        options: (value) => {
+          if (!value) return [];
+          const array = Array.isArray(value) ? value : [value];
+  
+          return array.map(t => String(t).trim().toLowerCase()).filter(t => t !== "");
+        }
       },
+      
+      custom: {
+        options: (value) => {
+        
+          if (!Array.isArray(value)) return true;
+          
+          const validOptions = ['italiana', 'china', 'mexicana', 'japonesa', 'india', 'mediterranea', 'española', 'turca'];
+          const allValid = value.every(t => validOptions.includes(t));
+          if (!allValid) {
+            throw new Error(`Los tipos de comida deben ser opciones válidas: ${validOptions.join(', ')}`);
+          }
+          return true;
+        }
+      }
     },
     limit: {
       in: ['query'],
