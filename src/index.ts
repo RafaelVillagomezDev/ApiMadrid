@@ -4,6 +4,7 @@ import imageRoutes from './routes/v1/image-routes';
 import locationRoutes from './routes/v1/location-routes';
 import anonymusRoutes from './routes/v1/user-anonymus-routes';
 import menuRoutes from './routes/v1/menu-routes';
+import dishRoutes from './routes/v1/dish-routes';
 import cors from 'cors';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -72,6 +73,7 @@ app.use('/api/v1/image', imageRoutes);
 app.use('/api/v1/menu', menuRoutes);
 app.use('/api/v1/location', locationRoutes);
 app.use('/api/v1/anonymous', anonymusRoutes);
+app.use('/api/v1/dish', dishRoutes);
 //Logger de errores para capturarlos s
 app.use(errorLogger);
 
