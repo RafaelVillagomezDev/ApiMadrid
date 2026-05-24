@@ -50,7 +50,7 @@ app.use(logger_middleware_1.requestLogger);
 //Cookie Parser
 app.use(auth_csrf_1.initCookieParser);
 //AUTH CSRF
-app.use('/api/', auth_csrf_1.csrfProtection);
+app.use('/api/', auth_csrf_1.csrfProtection);//
 //Rate limit Middleware
 app.use('/api/', rate_limit_middleware_1.apiLimiter);
 //Routes
