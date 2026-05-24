@@ -44,6 +44,7 @@ app.use(
       'Accept',
       'X-Requested-With',
     ],
+    exposedHeaders: ['X-New-CSRF-Token']
   }),
 );
 // Responder explícitamente a OPTIONS antes que a otros middlewares

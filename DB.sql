@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS DB_APIMADRID;
 CREATE DATABASE DB_APIMADRID;
 USE DB_APIMADRID;
 
@@ -38,14 +39,17 @@ CREATE TABLE MENU (
     FOREIGN KEY (restaurant_id) REFERENCES RESTAURANT(id) ON DELETE CASCADE
 );
 
+-- Tabla modificada: Permite platos sueltos (carta) y platos en menús
 CREATE TABLE DISHES (
     id CHAR(36) PRIMARY KEY,
-    menu_id CHAR(36) NOT NULL,
+    restaurant_id CHAR(36) NOT NULL,          -- Todo plato se asocia a un restaurante
+    menu_id CHAR(36) NULL,                    -- NULL si es plato suelto de la carta
     name VARCHAR(100) NOT NULL,
     description TEXT,
     price DECIMAL(6,2),
-    category VARCHAR(50),
-    FOREIGN KEY (menu_id) REFERENCES MENU(id) ON DELETE CASCADE
+    category VARCHAR(50),                     -- 'entrantes', 'principal', 'postres', 'bebidas'
+    FOREIGN KEY (restaurant_id) REFERENCES RESTAURANT(id) ON DELETE CASCADE,
+    FOREIGN KEY (menu_id) REFERENCES MENU(id) ON DELETE SET NULL
 );
 
 CREATE TABLE REFRESH_TOKENS (
@@ -82,24 +86,50 @@ CREATE TABLE LOCATION (
 );
 
 -- ----------------------------------------------------
--- 4. NUEVA TABLA: Blacklist para seguridad y rendimiento 🛡️
+-- 4. Seguridad y rendimiento
 -- ----------------------------------------------------
 
 CREATE TABLE BlacklistEntry (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    -- Valor a bloquear (IP, Client ID, etc.)
     value VARCHAR(255) NOT NULL,
-    -- Tipo de valor ('IP', 'CLIENT_ID')
     type VARCHAR(50) NOT NULL,
-    -- Razón del bloqueo
     reason TEXT,
-    -- Fecha de creación
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    -- Fecha de expiración (NULL = permanente)
     expires_at TIMESTAMP NULL,
-    -- Restricción para asegurar que no haya el mismo valor/tipo duplicado
     CONSTRAINT unique_value_type UNIQUE (value, type)
 );
 
--- Índice para optimizar las búsquedas de bloqueo
 CREATE INDEX idx_blacklist_lookup ON BlacklistEntry (value, type, expires_at);
+
+-- ----------------------------------------------------
+-- 5. VISTA: Cálculo dinámico de precio medio ponderado
+-- ----------------------------------------------------
+
+CREATE OR REPLACE VIEW V_RESTAURANTS AS
+SELECT 
+    r.id,
+    r.name,
+    r.email,
+    r.address,
+    r.description,
+    r.phone,
+    r.type_food,
+    r.web,
+    ROUND(
+        (COALESCE(AVG(CASE WHEN d.category = 'entrantes' THEN d.price END), 0.00) / 2) +
+        COALESCE(AVG(CASE WHEN d.category = 'principal' THEN d.price END), 0.00) +
+        (COALESCE(AVG(CASE WHEN d.category = 'postres'   THEN d.price END), 0.00) * 0.33) +
+        COALESCE(AVG(CASE WHEN d.category = 'bebidas'   THEN d.price END), 0.00), 
+        2
+    ) AS average_price
+FROM RESTAURANT r
+LEFT JOIN DISHES d ON r.id = d.restaurant_id
+GROUP BY 
+    r.id, 
+    r.name, 
+    r.email, 
+    r.address, 
+    r.description, 
+    r.phone, 
+    r.type_food, 
+    r.web;

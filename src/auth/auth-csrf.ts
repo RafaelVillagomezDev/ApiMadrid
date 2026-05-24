@@ -27,30 +27,35 @@ export const csrfProtection = (
   const isTokenRoute = req.originalUrl.includes('/v1/anonymous/token');
   const isSafeMethod = ['GET', 'HEAD', 'OPTIONS'].includes(req.method);
 
-  // 1. Obtener los tokens
+  // 1. Obtener los tokens (Usamos signedCookies para máxima seguridad)
   let cookieToken = req.signedCookies[CSRF_COOKIE_NAME];
   const headerToken = req.headers[CSRF_HEADER_NAME];
 
   if (!cookieToken || isTokenRoute) {
     cookieToken = generateToken();
 
+    // Guardamos el token de forma ultra segura en una cookie firmada y oculta para JS
     res.cookie(CSRF_COOKIE_NAME, cookieToken, {
-      httpOnly: false, // Obligatorio para que el Front lo lea
-      secure: req.hostname === 'localhost' ? false : true, // False en local para evitar bloqueos
-      signed: true, // CAMBIO CLAVE: Sin firma para que el valor sea idéntico al Header
+      httpOnly: true,     // 🔥 Blindado: El navegador protege la cookie contra ataques XSS
+      secure: req.hostname === 'localhost' ? false : true,
+      signed: true,       // Encriptado y firmado en el almacenamiento del navegador
       sameSite: 'lax',
       maxAge: 30 * 60 * 1000, // 30 minutos
-      path: '/', // Asegura que esté disponible en toda la API
+      path: '/',
     });
+
+    // 🔥 LA CLAVE: Enviamos el token limpio en la cabecera de respuesta HTTP
+    res.setHeader('X-New-CSRF-Token', cookieToken);
 
     if (isTokenRoute) return next();
   }
 
   if (isSafeMethod) return next();
 
+  // 2. Validación estricta para métodos de escritura (POST, PUT, DELETE)
   if (!headerToken || !cookieToken || cookieToken !== headerToken) {
     console.error(
-      `[CSRF Alert] Header: ${headerToken ? 'Present' : 'Missing'} | Cookie: ${cookieToken ? 'Present' : 'Missing'}`,
+      `[CSRF Alert] Header: ${headerToken ? 'Present' : 'Missing'} | Cookie: ${cookieToken ? 'Present' : 'Missing'}`
     );
 
     const response: ApiResponseInterface = {
