@@ -1,4 +1,8 @@
 import { checkSchema } from 'express-validator';
+import { pool } from '../connection/bd';
+import { isRestaurant } from '../queries/restaurant-query';
+import { isMenu } from '../queries/menu-query';
+const promisePool = pool.promise();
 
 const DishSchema = {
     create: checkSchema({
@@ -11,20 +15,50 @@ const DishSchema = {
             },
         },
         restaurant_id: {
-            in: ['body'],
+            in: ['params'],
             trim: true,
             optional: false,
             isUUID: {
                 errorMessage: 'El ID del restaurante debe ser un UUID válido',
             },
+            custom: {
+                options: async (value) => {
+                    const [rows]: [any[], any] = await promisePool.query(isRestaurant(), [
+                        value,
+                    ]);
+
+                    if (rows.length === 0) {
+                        throw new Error(
+                            'No existe un restaurante con ese ID en la base de datos',
+                        );
+                    }
+
+                    return true;
+                },
+            }
         },
         menu_id: {
-            in: ['body'],
+            in: ['params'],
             trim: true,
             optional: true,
             isUUID: {
                 errorMessage: 'El ID del menú debe ser un UUID válido',
             },
+            custom: {
+                options: async (value) => {
+                    const [rows]: [any[], any] = await promisePool.query(isMenu(), [
+                        value,
+                    ]);
+
+                    if (rows.length === 0) {
+                        throw new Error(
+                            'No existe un menú con ese ID en la base de datos',
+                        );
+                    }
+
+                    return true;
+                },
+            }
         },
         name: {
             in: ['body'],
@@ -55,7 +89,7 @@ const DishSchema = {
         },
         category: {
             in: ['body'],
-            optional: false, 
+            optional: false,
             trim: true,
             isLength: {
                 options: { min: 3, max: 20 },

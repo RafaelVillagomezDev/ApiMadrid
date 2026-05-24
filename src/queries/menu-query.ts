@@ -8,4 +8,10 @@ const createDishes = (): string => {
   return query;
 };
 
-export { createMenu, createDishes };
+const isMenu= (): string => {
+  const query = `SELECT EXISTS(SELECT 1 FROM menus WHERE id = ?) AS "exists"`;
+  return query;
+};
+
+
+export { createMenu, createDishes ,isMenu };
