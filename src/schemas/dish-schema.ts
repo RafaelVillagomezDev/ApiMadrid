@@ -6,14 +6,6 @@ const promisePool = pool.promise();
 
 const DishSchema = {
     create: checkSchema({
-        id: {
-            in: ['body'],
-            trim: true,
-            optional: false,
-            isUUID: {
-                errorMessage: 'El ID del plato debe ser un UUID válido',
-            },
-        },
         restaurant_id: {
             in: ['params'],
             trim: true,
@@ -90,17 +82,15 @@ const DishSchema = {
         category: {
             in: ['body'],
             optional: false,
-            trim: true,
-            isLength: {
-                options: { min: 3, max: 20 },
-                errorMessage: 'La categoría del plato debe tener entre 3 y 20 caracteres',
+            isString: {
+                errorMessage: 'La categoría debe ser un formato de texto válido (string)',
             },
+            trim: true,
             isIn: {
-                options: [['entrantes', 'principal', 'postres', 'bebidas']],//Nos exige que enviemos una de estas 4 categorías en un array
+                options: [['entrantes', 'principal', 'postres', 'bebidas']],
                 errorMessage: 'La categoría debe ser una de las siguientes: entrantes, principal, postres o bebidas',
             },
-        },
-
+        }
     }),
 };
 

@@ -27,7 +27,7 @@ const MenuController = {
       const validData = matchedData(req, { locations: ['body'] });
 
       const menu: MenuInterface = {
-        id: uuidv4(),
+        id: await uuidv4(),
         restaurant_id: validData.restaurant_id,
         name: validData.name,
         description: validData.description,
