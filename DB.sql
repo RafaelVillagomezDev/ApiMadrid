@@ -49,7 +49,8 @@ CREATE TABLE DISHES (
     price DECIMAL(6,2),
     category VARCHAR(50),                     -- 'entrantes', 'principal', 'postres', 'bebidas'
     FOREIGN KEY (restaurant_id) REFERENCES RESTAURANT(id) ON DELETE CASCADE,
-    FOREIGN KEY (menu_id) REFERENCES MENU(id) ON DELETE SET NULL
+    FOREIGN KEY (menu_id) REFERENCES MENU(id) ON DELETE SET NULL,
+    CONSTRAINT unique_dish_name_per_restaurant UNIQUE (restaurant_id, name)
 );
 
 CREATE TABLE REFRESH_TOKENS (
