@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiResponseInterface } from '../types/api-type';
 import { matchedData, validationResult } from 'express-validator';
 import { v4 as uuidv4 } from 'uuid';
+import { DishFactory } from '../factory/dish-factory';
 
 const DishController = {
     create: async (req: Request,
@@ -32,11 +33,11 @@ const DishController = {
                 category: validData.category,
             };
 
+            await DishFactory.createDish(dish);
+
             const response: ApiResponseInterface = {
                 message: 'Plato creado con éxito',
-                data: dish,
                 code: 200,
-                count: 1
             };
 
             res.status(200).send(response);
