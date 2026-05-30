@@ -48,7 +48,7 @@ const RestaurantController = {
       const geoData = await getCoords(validData.address);
 
       const location: LocationInterface = {
-        id: uuidv4(),
+        id: await uuidv4(),
         relatedId: restaurantId, // Usamos el ID generado
         relatedType: 'restaurant',
         address: validData.address,

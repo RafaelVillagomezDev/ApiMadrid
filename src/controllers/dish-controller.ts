@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiResponseInterface } from '../types/api-type';
 import { matchedData, validationResult } from 'express-validator';
-
+import { v4 as uuidv4 } from 'uuid';
 
 const DishController = {
     create: async (req: Request,
@@ -22,9 +22,19 @@ const DishController = {
 
             const validData = matchedData(req);
 
+            const dish = {
+                id: await uuidv4(),
+                restaurant_id: validData.restaurant_id,
+                menu_id: validData.menu_id,
+                name: validData.name,
+                description: validData.description,
+                price: validData.price,
+                category: validData.category,
+            };
+
             const response: ApiResponseInterface = {
-                message: 'Restaurante obtenidos con éxito',
-                data: validData,
+                message: 'Plato creado con éxito',
+                data: dish,
                 code: 200,
                 count: 1
             };

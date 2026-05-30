@@ -39,7 +39,7 @@ class Menu implements MenuInterface {
       const queryCreateDish = createDishes();
 
       for (const dish of this.dishes) {
-        const dishId = uuidv4();
+        const dishId = await uuidv4();
         await conn.query<ResultSetHeader>(queryCreateDish, [
           dishId,
           this.id,

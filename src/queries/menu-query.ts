@@ -9,7 +9,7 @@ const createDishes = (): string => {
 };
 
 const isMenu= (): string => {
-  const query = `SELECT EXISTS(SELECT 1 FROM menus WHERE id = ?) AS "exists"`;
+  const query = `SELECT EXISTS(SELECT 1 FROM menu WHERE id = ?) AS "exists"`;
   return query;
 };
 
