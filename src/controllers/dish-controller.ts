@@ -5,9 +5,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { DishFactory } from '../factory/dish-factory';
 
 const DishController = {
-    create: async (req: Request,
+    create: async (
+        req: Request,
         res: Response,
-        next: NextFunction): Promise<void> => {
+        next: NextFunction
+    ): Promise<void> => {
         try {
             const errors = validationResult(req);
             const errorResponse: ApiResponseInterface = {
@@ -22,28 +24,31 @@ const DishController = {
             }
 
             const validData = matchedData(req);
+            const dishesArray = validData.dishes || [];
 
-            const dish = {
-                id: await uuidv4(),
-                restaurant_id: validData.restaurant_id,
-                menu_id: validData.menu_id,
-                name: validData.name,
-                description: validData.description,
-                price: validData.price,
-                category: validData.category,
-            };
+            // Mapeamos el array de la petición al formato que necesita tu base de datos
+            const dishesToCreate = dishesArray.map((dishItem: any) => ({
+                id: uuidv4(),
+                restaurant_id: dishItem.restaurant_id,
+                menu_id: dishItem.menu_id || null,
+                name: dishItem.name,
+                description: dishItem.description || null,
+                price: dishItem.price,
+                category: dishItem.category,
+            }));
 
-            await DishFactory.createDish(dish);
+
+            await DishFactory.createDishes(dishesToCreate);
 
             const response: ApiResponseInterface = {
-                message: 'Plato creado con éxito',
+                message: `${dishesToCreate.length} platos creados con éxito`,
                 code: 200,
             };
 
             res.status(200).send(response);
         } catch (error) {
-            console.error('Error al crear el plato:', error);
-            res.status(500).json({ error: 'Error al crear el plato' });
+            console.error('Error al crear los platos:', error);
+            res.status(500).json({ error: 'Error al crear los platos' });
         }
     },
 };

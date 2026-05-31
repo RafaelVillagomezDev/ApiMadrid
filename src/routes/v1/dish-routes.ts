@@ -6,7 +6,7 @@ import { checkBlacklist } from '../../middleware/verify-token-blacklist';
 
 const router: Router = express.Router();
 router.post(
-  '/create/:restaurant_id/:menu_id',
+  '/create/:restaurant_id',
   DishSchema.create,
   DishController.create,
   //authToken,
