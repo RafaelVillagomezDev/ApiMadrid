@@ -27,9 +27,24 @@ CREATE TABLE RESTAURANT (
     INDEX idx_name_address (name, address)
 );
 
+CREATE TABLE METHODS_PAYMENT (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL,         
+    icon_url VARCHAR(255) NULL                 
+);
+
 -- ----------------------------------------------------
--- 2. Tablas relacionadas (Datos del Restaurante/Usuario)
+-- 2. Tablas relacionadas 
 -- ----------------------------------------------------
+
+CREATE TABLE RESTAURANT_PAYMENTS (
+    restaurant_id CHAR(36) NOT NULL,
+    method_payment_id INT NOT NULL,
+    PRIMARY KEY (restaurant_id, method_payment_id),
+    FOREIGN KEY (restaurant_id) REFERENCES RESTAURANT(id) ON DELETE CASCADE,
+    FOREIGN KEY (method_payment_id) REFERENCES METHODS_PAYMENT(id) ON DELETE CASCADE,
+    INDEX idx_payment_restaurant (method_payment_id, restaurant_id)
+);
 
 CREATE TABLE MENU (
     id CHAR(36) PRIMARY KEY,
@@ -39,18 +54,19 @@ CREATE TABLE MENU (
     FOREIGN KEY (restaurant_id) REFERENCES RESTAURANT(id) ON DELETE CASCADE
 );
 
--- Tabla modificada: Permite platos sueltos (carta) y platos en menús
 CREATE TABLE DISHES (
     id CHAR(36) PRIMARY KEY,
-    restaurant_id CHAR(36) NOT NULL,          -- Todo plato se asocia a un restaurante
-    menu_id CHAR(36) NULL,                    -- NULL si es plato suelto de la carta
+    restaurant_id CHAR(36) NOT NULL,          
+    menu_id CHAR(36) NULL,                    
     name VARCHAR(100) NOT NULL,
     description TEXT,
     price DECIMAL(6,2),
-    category VARCHAR(50),                     -- 'entrantes', 'principal', 'postres', 'bebidas'
+    category VARCHAR(50),                     
     FOREIGN KEY (restaurant_id) REFERENCES RESTAURANT(id) ON DELETE CASCADE,
     FOREIGN KEY (menu_id) REFERENCES MENU(id) ON DELETE SET NULL,
-    CONSTRAINT unique_dish_name_per_restaurant UNIQUE (restaurant_id, name)
+    CONSTRAINT unique_dish_name_per_restaurant UNIQUE (restaurant_id, name),
+    -- Índice añadido para la búsqueda masiva de platos de tu controlador anterior
+    INDEX idx_restaurant_menu_category (restaurant_id, menu_id, category) 
 );
 
 CREATE TABLE REFRESH_TOKENS (
@@ -70,7 +86,8 @@ CREATE TABLE IMAGES (
     relatedId CHAR(36) NOT NULL,
     relatedType VARCHAR(50) NOT NULL,
     url VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_images_polymorphic (relatedId, relatedType)
 );
 
 CREATE TABLE LOCATION (
@@ -83,7 +100,8 @@ CREATE TABLE LOCATION (
     town VARCHAR(30),
     country VARCHAR(30),
     county VARCHAR(30),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_location_polymorphic (relatedId, relatedType)
 );
 
 -- ----------------------------------------------------
@@ -103,7 +121,7 @@ CREATE TABLE BlacklistEntry (
 CREATE INDEX idx_blacklist_lookup ON BlacklistEntry (value, type, expires_at);
 
 -- ----------------------------------------------------
--- 5. VISTA: Cálculo dinámico de precio medio ponderado
+-- 5. VISTA: Corregida para agrupar sin la columna JSON
 -- ----------------------------------------------------
 
 CREATE OR REPLACE VIEW V_RESTAURANTS AS
@@ -134,3 +152,15 @@ GROUP BY
     r.phone, 
     r.type_food, 
     r.web;
+
+
+-- ----------------------------------------------------
+-- 6. Inserciones de datos iniciales (Seeders)
+-- ----------------------------------------------------
+
+-- ----------------------------------------------------
+INSERT INTO METHODS_PAYMENT (name, icon_url) VALUES 
+('Efectivo', 'https://res.cloudinary.com/dlxgtpema/image/upload/v1780251884/cash_sqndkx.svg'),
+('Visa', 'https://res.cloudinary.com/dlxgtpema/image/upload/v1780251883/visa_pcdahv.svg'),
+('Apple Pay', 'https://res.cloudinary.com/dlxgtpema/image/upload/v1780251883/apple_pay_mg6p2a.svg'),
+('Mastercard', 'https://res.cloudinary.com/dlxgtpema/image/upload/v1780251883/mastercard_y8ysl9.svg');
