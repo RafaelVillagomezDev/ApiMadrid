@@ -6,19 +6,11 @@ const promisePool = pool.promise();
 
 const DishSchema = {
     create: checkSchema({
-        dishes: {
-            in: ['body'],
-            isArray: {
-                options: { min: 1 },
-                errorMessage: 'Debe proporcionar un array de platos con al menos un elemento',
-            },
-        },
-        'dishes.*.restaurant_id': {
+        restaurant_id: {
             in: ['params'], 
             trim: true,
-            optional: false,
             isUUID: {
-                errorMessage: 'El ID del restaurante debe ser un UUID válido',
+                errorMessage: 'El ID del restaurante en la URL debe ser un UUID válido',
             },
             custom: {
                 options: async (value) => {
@@ -29,6 +21,13 @@ const DishSchema = {
                     return true;
                 },
             }
+        },
+        dishes: {
+            in: ['body'],
+            isArray: {
+                options: { min: 1 },
+                errorMessage: 'Debe proporcionar un array de platos con al menos un elemento',
+            },
         },
         'dishes.*.menu_id': {
             in: ['body'],

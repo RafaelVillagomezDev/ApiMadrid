@@ -1,22 +1,20 @@
-import { createDishes, createMenu } from '../../queries/menu-query';
+import { createMenu } from '../../queries/menu-query';
 import { pool } from '../../connection/bd';
-import { DishInterface, MenuInterface } from '../../types/menu-types';
+import { MenuInterface } from '../../types/menu-types';
 import { ResultSetHeader } from 'mysql2';
-import { v4 as uuidv4 } from 'uuid';
+
 
 class Menu implements MenuInterface {
   id: string;
   restaurant_id: string;
   name: string;
   description?: string;
-  dishes: DishInterface[];
 
-  constructor({ id, restaurant_id, name, description, dishes }: MenuInterface) {
+  constructor({ id, restaurant_id, name, description }: MenuInterface) {
     this.id = id;
     this.restaurant_id = restaurant_id;
     this.name = name;
     this.description = description;
-    this.dishes = dishes || [];
   }
 
   async createMenu(): Promise<number> {
@@ -35,21 +33,7 @@ class Menu implements MenuInterface {
       if (menuResult.affectedRows === 0) {
         throw new Error('No se pudo crear el menú');
       }
-
-      const queryCreateDish = createDishes();
-
-      for (const dish of this.dishes) {
-        const dishId = await uuidv4();
-        await conn.query<ResultSetHeader>(queryCreateDish, [
-          dishId,
-          this.id,
-          dish.name,
-          dish.description || null,
-          dish.price,
-          dish.category,
-        ]);
-      }
-
+     
       await conn.commit();
       return menuResult.affectedRows;
     } catch (err: unknown) {
