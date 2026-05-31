@@ -24,14 +24,13 @@ const MenuController = {
         return;
       }
 
-      const validData = matchedData(req, { locations: ['body'] });
+      const validData = matchedData(req);
 
       const menu: MenuInterface = {
-        id: await uuidv4(),
+        id: uuidv4(),
         restaurant_id: validData.restaurant_id,
         name: validData.name,
         description: validData.description,
-        dishes: validData.dishes,
       };
 
       await MenuFactory.createMenu(menu);

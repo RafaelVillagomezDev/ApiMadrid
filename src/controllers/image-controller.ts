@@ -57,7 +57,7 @@ const ImageController = {
         );
 
         const image: ImageInterface = {
-          id: await uuidv4(),
+          id: uuidv4(),
           relatedId,
           relatedType,
           url: optimizedUrl, // Guardamos la URL ya optimizada

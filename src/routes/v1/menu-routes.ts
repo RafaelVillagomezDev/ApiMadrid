@@ -5,6 +5,6 @@ import express, { Router } from 'express';
 
 const router: Router = express.Router();
 
-router.post('/create', MenuSchema.create, MenuController.createMenu);
+router.post('/create/:restaurant_id', MenuSchema.create, MenuController.createMenu);
 
 export default router;

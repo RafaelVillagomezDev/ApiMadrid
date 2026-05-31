@@ -10,7 +10,6 @@ interface MenuInterface {
   restaurant_id: string;
   name: string;
   description?: string;
-  dishes: DishInterface[];
 }
 
 export { MenuInterface, DishInterface };

@@ -29,7 +29,7 @@ const DishController = {
             // Mapeamos el array de la petición al formato que necesita tu base de datos
             const dishesToCreate = dishesArray.map((dishItem: any) => ({
                 id: uuidv4(),
-                restaurant_id: dishItem.restaurant_id,
+                restaurant_id: validData.restaurant_id,
                 menu_id: dishItem.menu_id || null,
                 name: dishItem.name,
                 description: dishItem.description || null,

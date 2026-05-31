@@ -32,7 +32,7 @@ const LocationController = {
 
       const location: LocationInterface = {
         relatedId: validData.relatedId,
-        id: await uuidv4(),
+        id:  uuidv4(),
         relatedType: validData.relatedType,
         address: validData.address,
         latitude: geoData.latitud,
