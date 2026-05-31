@@ -86,37 +86,58 @@ class Restaurant implements RestaurantInterface {
 
 
 
-  async getRestaurants(obj: RestaurantQueryPagination) {
-    const { id, name, address,type_food, limit, offset } = obj;
-    const [queryRestaurants, values] = getRestaurantData({
-      id,
-      name,
-      address,
-      type_food,
-      limit,
-      offset,
-    });
+ async getRestaurants(obj: RestaurantQueryPagination) {
+  const { id, name, address, type_food, limit, offset } = obj;
 
-    const [queryCount, countValues] = countTotalRestaurants({ id, name,address,type_food });
+  //  Obtenemos las queries estructuradas desde la función dinámica modificada
+  const queries = getRestaurantData({
+    id,
+    name,
+    address,
+    type_food,
+    limit,
+    offset,
+  });
 
-    const [[rows], [countRows]]: [any[], any] = await Promise.all([
-      promisePool.query(queryRestaurants, values),
-      promisePool.query(queryCount, countValues)
-    ]);
+  // Obtenemos la query de conteo total 
+  const [queryCount, countValues] = countTotalRestaurants({ id, name, address, type_food });
 
-    if (!rows || rows.length === 0) {
-      throw new Error('No existen restaurantes con esas condiciones');
-    }
+  //  Ejecutamos la query base principal de restaurantes y el conteo total en paralelo
+  const [[restaurantsRows], [countRows]]: [any[], any] = await Promise.all([
+    promisePool.query(queries.restaurantBaseQuery, queries.baseValues),
+    promisePool.query(queryCount, countValues)
+  ]);
 
-    const data = formatRestaurantData(rows);
-    const total = countRows[0].total;
-    
-    
-    return {
-      "data":data,
-      "total":total
-    };
+  // Si no se encontraron resultados para los filtros aplicados en esta página
+  if (!restaurantsRows || restaurantsRows.length === 0) {
+    throw new Error('No existen restaurantes con esas condiciones');
   }
+
+  //  Extraemos los IDs únicos de los restaurantes encontrados en esta página
+  const restaurantIds = restaurantsRows.map((r: any) => r.restaurant_id);
+
+  // Lanzamos las queries relacionales secundarias de forma simultánea (IN (?))
+  const [[imagesRows], [paymentsRows], [menusAndDishesRows]]: [any[], any[], any[]] = await Promise.all([
+    promisePool.query(queries.imagesQuery, [restaurantIds]),
+    promisePool.query(queries.paymentsQuery, [restaurantIds]),
+    promisePool.query(queries.menusAndDishesQuery, [restaurantIds])
+  ]);
+
+  // 5. Pasamos todos los buffers de datos al nuevo formateador optimizado O(N)
+  const data = formatRestaurantData({
+    restaurantsRows,
+    imagesRows,
+    paymentsRows,
+    menusAndDishesRows
+  });
+
+  const total = countRows[0].total;
+  
+  return {
+    data,
+    total
+  };
+}
 
   async removeRestaurants(): Promise<number> {
     const queryRemoveRestaurants = removeRestaurantsData();

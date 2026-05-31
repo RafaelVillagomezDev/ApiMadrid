@@ -77,7 +77,7 @@ const RestaurantController = {
       next(error);
     }
   },
-  getRestaurants: async (
+getRestaurants: async (
     req: Request,
     res: Response<ApiResponseInterface>,
     next: NextFunction,
@@ -95,13 +95,14 @@ const RestaurantController = {
         return;
       }
 
-      const validData = matchedData(req);
+      // includeOptionals: true asegura que los filtros que no se envíen queden como undefined o null en lugar de desaparecer
+      const validData = matchedData(req, { includeOptionals: true });
 
       const queryData: RestaurantQueryPagination = {
         name: validData.name,
         id: validData.id,
         address: validData.address,
-        type_food:validData.type_food,
+        type_food: validData.type_food,
         limit: validData.limit,
         offset: validData.offset,
       };
@@ -109,7 +110,7 @@ const RestaurantController = {
       const data = await RestaurantFactory.getRestaurant(queryData);
 
       const response: ApiResponseInterface = {
-        message: 'Restaurante obtenidos con éxito',
+        message: 'Restaurantes obtenidos con éxito', 
         data: data.data,
         code: 200,
         count: data.total,
