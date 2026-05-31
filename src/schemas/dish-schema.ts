@@ -6,8 +6,15 @@ const promisePool = pool.promise();
 
 const DishSchema = {
     create: checkSchema({
-        restaurant_id: {
-            in: ['params'],
+        dishes: {
+            in: ['body'],
+            isArray: {
+                options: { min: 1 },
+                errorMessage: 'Debe proporcionar un array de platos con al menos un elemento',
+            },
+        },
+        'dishes.*.restaurant_id': {
+            in: ['params'], 
             trim: true,
             optional: false,
             isUUID: {
@@ -15,22 +22,16 @@ const DishSchema = {
             },
             custom: {
                 options: async (value) => {
-                    const [rows]: [any[], any] = await promisePool.query(isRestaurant(), [
-                        value,
-                    ]);
-
+                    const [rows]: [any[], any] = await promisePool.query(isRestaurant(), [value]);
                     if (rows.length === 0) {
-                        throw new Error(
-                            'No existe un restaurante con ese ID en la base de datos',
-                        );
+                        throw new Error('No existe un restaurante con ese ID en la base de datos');
                     }
-
                     return true;
                 },
             }
         },
-        menu_id: {
-            in: ['params'],
+        'dishes.*.menu_id': {
+            in: ['body'],
             trim: true,
             optional: true,
             isUUID: {
@@ -38,21 +39,18 @@ const DishSchema = {
             },
             custom: {
                 options: async (value) => {
-                    const [rows]: [any[], any] = await promisePool.query(isMenu(), [
-                        value,
-                    ]);
-
+                    // Evitamos query innecesaria si el valor opcional no viene
+                    if (!value) return true; 
+                    
+                    const [rows]: [any[], any] = await promisePool.query(isMenu(), [value]);
                     if (rows.length === 0) {
-                        throw new Error(
-                            'No existe un menú con ese ID en la base de datos',
-                        );
+                        throw new Error('No existe un menú con ese ID en la base de datos');
                     }
-
                     return true;
                 },
             }
         },
-        name: {
+        'dishes.*.name': {
             in: ['body'],
             trim: true,
             optional: false,
@@ -61,17 +59,16 @@ const DishSchema = {
                 errorMessage: 'El nombre del plato debe tener entre 3 y 100 caracteres',
             },
         },
-        description: {
+        'dishes.*.description': {
             in: ['body'],
             optional: true,
             trim: true,
             isLength: {
                 options: { min: 3, max: 250 },
-                errorMessage:
-                    'La descripción del plato debe tener al menos 3 caracteres',
+                errorMessage: 'La descripción del plato debe tener al menos 3 caracteres',
             },
         },
-        price: {
+        'dishes.*.price': {
             in: ['body'],
             optional: false,
             isFloat: {
@@ -79,7 +76,7 @@ const DishSchema = {
                 errorMessage: 'El precio del plato debe ser un número positivo',
             },
         },
-        category: {
+        'dishes.*.category': {
             in: ['body'],
             optional: false,
             isString: {
@@ -93,5 +90,4 @@ const DishSchema = {
         }
     }),
 };
-
 export { DishSchema };
