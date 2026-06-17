@@ -5,6 +5,7 @@ import locationRoutes from './routes/v1/location-routes';
 import anonymusRoutes from './routes/v1/user-anonymus-routes';
 import menuRoutes from './routes/v1/menu-routes';
 import dishRoutes from './routes/v1/dish-routes';
+import userRoutes from './routes/v1/user-routes';
 import cors from 'cors';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -73,12 +74,14 @@ app.use('/api/v1/image', imageRoutes);
 app.use('/api/v1/menu', menuRoutes);
 app.use('/api/v1/location', locationRoutes);
 app.use('/api/v1/anonymous', anonymusRoutes);
+app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/dish', dishRoutes);
 //Logger de errores para capturarlos s
 app.use(errorLogger);
+//Envio errores a Cliente
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
-//Envio errores a Cliente
-app.use(errorHandler);
+
