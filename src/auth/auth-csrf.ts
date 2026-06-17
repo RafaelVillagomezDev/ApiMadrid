@@ -25,13 +25,14 @@ export const csrfProtection = (
   next: NextFunction,
 ) => {
   const isTokenRoute = req.originalUrl.includes('/v1/anonymous/token');
+  const isTokenRouteClient = req.originalUrl.includes('/v1/user/token');
   const isSafeMethod = ['GET', 'HEAD', 'OPTIONS'].includes(req.method);
 
   // 1. Obtener los tokens (Usamos signedCookies para máxima seguridad)
   let cookieToken = req.signedCookies[CSRF_COOKIE_NAME];
   const headerToken = req.headers[CSRF_HEADER_NAME];
 
-  if (!cookieToken || isTokenRoute) {
+  if (!cookieToken || isTokenRoute || isTokenRouteClient) {
     cookieToken = generateToken();
 
     // Guardamos el token de forma ultra segura en una cookie firmada y oculta para JS
@@ -47,7 +48,7 @@ export const csrfProtection = (
     // 🔥 LA CLAVE: Enviamos el token limpio en la cabecera de respuesta HTTP
     res.setHeader('X-New-CSRF-Token', cookieToken);
 
-    if (isTokenRoute) return next();
+    if (isTokenRoute || isTokenRouteClient) return next();
   }
 
   if (isSafeMethod) return next();

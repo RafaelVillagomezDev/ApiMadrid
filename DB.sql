@@ -9,7 +9,9 @@ USE DB_APIMADRID;
 CREATE TABLE USERS (
     id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
+    surname VARCHAR(100) DEFAULT NULL, 
     email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) DEFAULT NULL,  
     role ENUM('user', 'cliente', 'admin') DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
