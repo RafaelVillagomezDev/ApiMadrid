@@ -2,6 +2,7 @@ import { UserInterface } from '../../types/user-type';
 
 import { pool } from '../../connection/bd';
 import { ResultSetHeader } from 'mysql2';
+import { createUser} from '../../queries/user-query';
 
 const promisePool = pool.promise();
 
@@ -21,7 +22,6 @@ class User implements UserInterface {
     surname,
     password,
     role,
-    created_at,
   }: UserInterface) {
     this.id = id;
     this.email = email;
@@ -29,9 +29,27 @@ class User implements UserInterface {
     this.surname = surname;
     this.password = password;
     this.role = role;
-    this.created_at = created_at;
   }
 
+   async createUser(): Promise<number> {
+    const queryCreate = createUser();
+    const [result] = await promisePool.query<ResultSetHeader>(queryCreate, [
+      this.id,
+      this.email,
+      this.name,
+      this.surname,
+      this.password,
+      this.role,
+    ]);
+
+    if (result.affectedRows === 0) {
+      throw new Error('No se pudo crear el usuario');
+    }
+
+    return result.affectedRows;
+  }
+
+ 
  
 }
 
