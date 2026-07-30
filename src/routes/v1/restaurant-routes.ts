@@ -10,6 +10,8 @@ const router: Router = express.Router();
 
 router.post(
   '/create',
+  authToken,
+  checkBlacklist,
   RestaurantSchema.create,
   RestaurantController.createRestaurant,
 );
