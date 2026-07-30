@@ -55,16 +55,19 @@ export const csrfProtection = (
 
   // 2. Validación estricta para métodos de escritura (POST, PUT, DELETE)
   if (!headerToken || !cookieToken || cookieToken !== headerToken) {
-    console.error(
-      `[CSRF Alert] Header: ${headerToken ? 'Present' : 'Missing'} | Cookie: ${cookieToken ? 'Present' : 'Missing'}`
-    );
+  console.error({
+    alerta: '[CSRF Fallo]',
+    headerRecibido: headerToken || 'UNDEFINED (El frontend no lo envió en los headers)',
+    cookieRecibida: cookieToken || 'UNDEFINED (El navegador no envió la cookie)',
+    sonIguales: cookieToken === headerToken
+  });
 
-    const response: ApiResponseInterface = {
-      message: 'Acceso denegado. Los tokens CSRF no coinciden o han expirado.',
-      code: 403,
-    };
-    return res.status(403).json(response);
-  }
+  const response: ApiResponseInterface = {
+    message: 'Acceso denegado. Los tokens CSRF no coinciden o han expirado.',
+    code: 403,
+  };
+  return res.status(403).json(response);
+}
 
   next();
 };

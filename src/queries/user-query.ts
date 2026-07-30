@@ -4,12 +4,12 @@ const isUser= (): string => {
   return query;
 };
 
-const registerUser = (): string => {
+const createUser = (): string => {
   const query = `
     INSERT INTO USERS (id, name, email, password, role) 
-    VALUES (?, ?, ?, ?, 'cliente')
+    VALUES (?, ?, ?, ?,?,'cliente')
   `;
   return query;
 };
 
-export { isUser, registerUser };
+export { isUser, createUser };

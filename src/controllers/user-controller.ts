@@ -4,6 +4,8 @@ import { ApiResponseInterface } from '../types/api-type';
 import { UserData } from '../types/jwt-type';
 import crypto from 'crypto';
 import { matchedData, validationResult } from 'express-validator';
+import { UserInterface } from '../types/user-type';
+import { UserFactory } from '../factory/user-factory';
 
 
 const UserController = {
@@ -21,9 +23,9 @@ const UserController = {
 
             const validData = matchedData(req);
 
-    
+
             const payloadData: UserData = {
-                id_user: 'ID-REAL-SACADO-DE-LA-BD',  
+                id_user: 'ID-REAL-SACADO-DE-LA-BD',
                 email: validData.email,
                 rol: 'cliente',
                 jti: crypto.randomUUID(),
@@ -31,7 +33,7 @@ const UserController = {
 
             const accessToken = await tokenSign(payloadData);
 
-            res.status(200).json({
+            res.status(200).send({
                 message: 'Acceso usuario concedido.',
                 data: { user: { token: accessToken } },
                 code: 200,
@@ -54,27 +56,27 @@ const UserController = {
             }
 
             const validData = matchedData(req);
-            
-           
+
+
             const newUserId = crypto.randomUUID();
-           
-            const payloadData: UserData = {
-                id_user: newUserId,
+
+            const user: UserInterface = {
+                id: newUserId,
                 email: validData.email,
-                rol: 'cliente',
-                jti: crypto.randomUUID(),
+                name: validData.name,
+                surname: validData.surname,
+                password: validData.password,
+                role: 'cliente',
             };
 
-            const accessToken = await tokenSign(payloadData);
+               await UserFactory.createUser(user);
 
-            
-
-
-            res.status(201).json({ 
-                message: 'Usuario creado exitosamente.',
-                data: { user: { token: accessToken } },
+            res.status(201).send({
+                message: 'Usuario creado con éxito.',
                 code: 201,
             });
+
+
         } catch (error) {
             next(error);
         }
