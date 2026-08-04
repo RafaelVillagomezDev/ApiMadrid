@@ -6,7 +6,7 @@ const isUser= (): string => {
 
 const createUser = (): string => {
   const query = `
-    INSERT INTO USERS (id, name, email, password, role) 
+    INSERT INTO USERS (id,email,name,surname, password, role) 
     VALUES (?, ?, ?, ?,?,'cliente')
   `;
   return query;
