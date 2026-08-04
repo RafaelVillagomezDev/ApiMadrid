@@ -23,17 +23,37 @@ const UserController = {
             }
 
             const validData = matchedData(req);
-
             
+  
             const userDB = await User.findByEmail(validData.email);
 
+         
+            if (!userDB || typeof userDB.password !== 'string') {
+                res.status(401).json({ message: 'Credenciales inválidas', code: 401 });
+                return;
+            }
+
+            if (typeof validData.password !== 'string') {
+                res.status(401).json({ message: 'Credenciales inválidas', code: 401 });
+                return;
+            }
+
+            const isPasswordValid = await bcrypt.compare(validData.password, userDB.password);
+
+            if (!isPasswordValid) {
+                res.status(401).json({ message: 'Credenciales inválidas', code: 401 });
+                return;
+            }
+
+            // 4. Creamos el payload con los datos REALES de la base de datos
             const payloadData: UserData = {
-                id_user: userDB?.id || 'ID-REAL-SACADO-DE-LA-BD',
-                email: validData.email,
-                rol: 'cliente',
+                id_user: userDB.id!,
+                email: userDB.email,
+                rol: (userDB.role ?? 'no_cliente') as 'cliente' | 'admin' | 'no_cliente',
                 jti: crypto.randomUUID(),
             };
 
+            // 5. Generamos el token
             const accessToken = await tokenSign(payloadData);
 
             res.status(200).send({
@@ -41,6 +61,7 @@ const UserController = {
                 data: { user: { token: accessToken } },
                 code: 200,
             });
+            
         } catch (error) {
             next(error);
         }
