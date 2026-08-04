@@ -7,7 +7,8 @@ import { checkBlacklist } from '../../middleware/verify-token-blacklist';
 
 const router: Router = express.Router();
 
-router.post('/token',UserSchema.login, UserController.loginUser);
-router.post('/create', authToken, checkBlacklist,revokeSession,UserSchema.create, UserController.createUser);
+router.post('/token', UserSchema.login, UserController.loginUser);
+router.post('/register',UserSchema.create, UserController.createUser);
+router.post('/login', authToken, UserSchema.login, UserController.loginUser);
 router.post('/logout', authToken, revokeSession);
 export default router;
