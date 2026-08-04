@@ -6,7 +6,8 @@ import crypto from 'crypto';
 import { matchedData, validationResult } from 'express-validator';
 import { UserInterface } from '../types/user-type';
 import { UserFactory } from '../factory/user-factory';
-
+import bcrypt from 'bcrypt';
+import { User } from '../models/user/user-model';
 
 const UserController = {
     loginUser: async (
@@ -23,9 +24,11 @@ const UserController = {
 
             const validData = matchedData(req);
 
+            
+            const userDB = await User.findByEmail(validData.email);
 
             const payloadData: UserData = {
-                id_user: 'ID-REAL-SACADO-DE-LA-BD',
+                id_user: userDB?.id || 'ID-REAL-SACADO-DE-LA-BD',
                 email: validData.email,
                 rol: 'cliente',
                 jti: crypto.randomUUID(),
@@ -65,7 +68,7 @@ const UserController = {
                 email: validData.email,
                 name: validData.name,
                 surname: validData.surname,
-                password: validData.password,
+                password: await bcrypt.hash(validData.password, 10),
                 role: 'cliente',
             };
 

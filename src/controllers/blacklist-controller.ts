@@ -1,9 +1,23 @@
 import { Request, Response } from 'express';
 import { addToken } from '../../src/models/blacklist/blacklist-model';
 
-export const revokeSession = async (req: Request, res: Response) => {
+
+interface JwtPayload {
+  jti: string;
+  exp: number;
+  id_user: string | number;
+}
+
+
+interface AuthRequest extends Request {
+  user?: JwtPayload;
+}
+
+// 3. Usas AuthRequest en lugar de Request
+export const revokeSession = async (req: AuthRequest, res: Response) => {
   try {
-    const userPayload = (req as any).user;
+   
+    const userPayload = req.user;
 
     if (!userPayload || !userPayload.jti) {
       return res
@@ -19,14 +33,19 @@ export const revokeSession = async (req: Request, res: Response) => {
       .replace('T', ' ');
 
     await addToken(
-      jti, // Esto irá a la columna 'value'
-      'LOGOUT_MANUAL', // Esto irá a la columna 'type'
-      expiresAt, // Esto irá a la columna 'expires_at'
-      `El usuario ${id_user} cerró sesión`, // Esto irá a la columna 'reason'
+      jti,
+      'LOGOUT_MANUAL',
+      expiresAt,
+      `El usuario ${id_user} cerró sesión`,
     );
 
-    // 4. Limpieza de cookies si las usas
-    res.clearCookie('anonymousRefreshToken');
+    // Limpieza de cookies
+    res.clearCookie('anonymousRefreshToken', {
+      httpOnly: true,
+      path: '/',
+      secure: true, // Descomenta si usas HTTPS en producción
+       sameSite: 'strict'
+    });
 
     return res.status(200).json({
       message: 'Sesión invalidada con éxito',

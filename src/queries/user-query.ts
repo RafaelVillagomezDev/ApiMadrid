@@ -10,6 +10,12 @@ const createUser = (): string => {
     VALUES (?, ?, ?, ?,?,'cliente')
   `;
   return query;
+
+
 };
 
-export { isUser, createUser };
+const getUserByEmail = (): string => {
+  return `SELECT id, email, name, surname, password, role FROM USERS WHERE email = ?`;
+};
+
+export { isUser, createUser,getUserByEmail };
