@@ -1,9 +1,6 @@
 const createRefreshTokenQuery = (): string => {
 
-    const query = `
-        INSERT INTO REFRESH_TOKENS (user_id, token, expires_at) 
-        VALUES (?, ?, ?)
-      `;
+    const query = `INSERT INTO REFRESH_TOKENS (user_id, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))`;
     return query;
 }
 

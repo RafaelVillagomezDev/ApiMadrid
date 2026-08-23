@@ -9,7 +9,7 @@ import { UserFactory } from '../factory/user-factory';
 import bcrypt from 'bcrypt';
 import { User } from '../models/user/user-model';
 import { cookieConfig } from '../auth/auth-csrf';
-import { RefreshToken } from '../models/auth/refresh-token-model'; 
+import { RefreshToken } from '../models/auth/refresh-token-model';
 
 const UserController = {
     loginUser: async (
@@ -25,7 +25,7 @@ const UserController = {
             }
 
             const validData = matchedData(req);
-            
+
             const userDB = await User.findByEmail(validData.email);
 
             if (!userDB || typeof userDB.password !== 'string') {
@@ -54,43 +54,42 @@ const UserController = {
             };
             const accessToken = await tokenSign(payloadData);
 
-         
-            const refreshTokenString = crypto.randomBytes(64).toString('hex');
-  
-            await RefreshToken.saveToken(userDB.id!, refreshTokenString, 7);
 
-         
+            const refreshTokenString = crypto.randomBytes(64).toString('hex');
+
+            await RefreshToken.saveToken(userDB.id!, refreshTokenString, 2);
+
             res.cookie('userRefreshToken', refreshTokenString, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', 
-                sameSite: 'none', // O 'strict' si no hay cross-domain
-                path: '/api/v1/auth/refresh', // Solo se enviará a esta ruta
-                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días en milisegundos
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                path: '/api/v1/auth/refresh',
+                maxAge: 300 * 1000 // 🔥 300 * 1000 para exactamente 5 minutos
             });
 
-      
+
             const newCsrfToken = crypto.randomBytes(32).toString('hex');
-            
-        
+
+
             res.clearCookie('_csrf_token', { path: '/' });
-            
-         
+
+
             res.cookie('_csrf_token', newCsrfToken, cookieConfig);
 
-            
+
             res.setHeader('X-New-CSRF-Token', newCsrfToken);
             res.setHeader('x-csrf-token', newCsrfToken);
             res.setHeader('Access-Control-Expose-Headers', 'x-csrf-token, X-New-CSRF-Token');
 
-            
+
             res.status(200).send({
                 message: 'Acceso usuario concedido.',
-                data: { 
+                data: {
                     user: { token: accessToken },
-                }, 
+                },
                 code: 200,
             });
-            
+
         } catch (error) {
             next(error);
         }

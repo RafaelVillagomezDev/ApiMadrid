@@ -20,7 +20,7 @@ export const tokenSign = async ({ id_user, email, rol, jti }: UserData) => {
     },
     SECRET_TOKEN,
     {
-      expiresIn: '30m', // Duración del Token de Acceso
+      expiresIn: '10s', // Duración del Token de Acceso
     },
   );
   return sign;
