@@ -53,14 +53,14 @@ const AuthController = {
             const newAccessToken = await tokenSign(payloadData);
 
             //  Enviamos la nueva cookie de Refresh rotada
-            res.cookie('userRefreshToken', newRefreshTokenString, {
+           res.cookie('userRefreshToken', newRefreshTokenString, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production', 
-                sameSite: 'none', 
+                // 🔥 SOLUCIÓN: Usar la misma lógica dinámica que en el login
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', 
                 path: '/api/v1/auth/refresh', 
-                maxAge: 7 * 24 * 60 * 60 * 1000 
+                maxAge: 120 * 1000 // Ponlo a 2 minutos para que coincida con tu prueba
             });
-
             
             res.status(200).json({
                 message: 'Token renovado con éxito',

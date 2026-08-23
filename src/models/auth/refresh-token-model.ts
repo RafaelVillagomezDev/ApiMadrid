@@ -26,15 +26,13 @@ class RefreshToken implements RefreshTokenInterface {
   static async saveToken(userId: string, token: string, expiresInDays: number): Promise<number> {
     const conn = await pool.promise().getConnection();
     
-    // Calcular fecha de expiración
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + expiresInDays);
-    const formattedDate = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
-
     try {
       
       
-      const [result] = await conn.execute<ResultSetHeader>(createRefreshTokenQuery(), [userId, token, formattedDate]);
+      const [result] = await conn.execute<ResultSetHeader>(
+        createRefreshTokenQuery(), 
+        [userId, token, 2] // 🔥 Pasamos 2 para que MySQL sume 2 minutos a SU propio reloj
+      );
       
       if (result.affectedRows === 0) {
         throw new Error('No se pudo insertar el Refresh Token en la base de datos.');
