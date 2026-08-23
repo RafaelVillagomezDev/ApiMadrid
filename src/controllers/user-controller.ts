@@ -8,6 +8,8 @@ import { UserInterface } from '../types/user-type';
 import { UserFactory } from '../factory/user-factory';
 import bcrypt from 'bcrypt';
 import { User } from '../models/user/user-model';
+import { cookieConfig } from '../auth/auth-csrf';
+
 
 const UserController = {
     loginUser: async (
@@ -24,10 +26,8 @@ const UserController = {
 
             const validData = matchedData(req);
             
-  
             const userDB = await User.findByEmail(validData.email);
 
-         
             if (!userDB || typeof userDB.password !== 'string') {
                 res.status(401).json({ message: 'Credenciales inválidas', code: 401 });
                 return;
@@ -52,13 +52,29 @@ const UserController = {
                 rol: (userDB.role ?? 'no_cliente') as 'cliente' | 'admin' | 'no_cliente',
                 jti: crypto.randomUUID(),
             };
-
-            // 5. Generamos el token
             const accessToken = await tokenSign(payloadData);
 
+            // 🔥 NUEVO: Rotamos el token CSRF automáticamente en el Login
+            const newCsrfToken = crypto.randomBytes(32).toString('hex');
+            
+            // 1. Limpiamos la anterior para forzar la actualización en el navegador
+            res.clearCookie('_csrf_token', { path: '/' });
+            
+            // 2. Usamos EXACTAMENTE la misma configuración dinámica exportada
+            res.cookie('_csrf_token', newCsrfToken, cookieConfig);
+
+            // Exponemos el nuevo token en los headers para que el frontend lo actualice
+            res.setHeader('X-New-CSRF-Token', newCsrfToken);
+            res.setHeader('x-csrf-token', newCsrfToken);
+            res.setHeader('Access-Control-Expose-Headers', 'x-csrf-token, X-New-CSRF-Token');
+
+            // Enviamos la respuesta final (opcionalmente incluyes el csrfToken en el data si tu frontend lo usa así)
             res.status(200).send({
                 message: 'Acceso usuario concedido.',
-                data: { user: { token: accessToken } },
+                data: { 
+                    user: { token: accessToken },
+                    csrfToken: newCsrfToken // Facilitamos al frontend que actualice su estado
+                }, 
                 code: 200,
             });
             
@@ -108,3 +124,5 @@ const UserController = {
 };
 
 export default UserController;
+
+

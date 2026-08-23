@@ -6,6 +6,7 @@ import anonymusRoutes from './routes/v1/user-anonymus-routes';
 import menuRoutes from './routes/v1/menu-routes';
 import dishRoutes from './routes/v1/dish-routes';
 import userRoutes from './routes/v1/user-routes';
+import csrfRoutes from './routes/v1/csrf-routes';
 import cors from 'cors';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -15,7 +16,21 @@ import { errorHandler } from './middleware/error-handler';
 import { apiLimiter } from './middleware/rate-limit-middleware';
 import { csrfProtection, initCookieParser } from './auth/auth-csrf';
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
+
+// Obtenemos el entorno inyectado por cross-env (o development por defecto)
+const env = process.env.NODE_ENV || 'development';
+
+// Si es desarrollo, busca '.env.development'. Si no, usa el '.env' por defecto
+const envFileName = env === 'development' ? '.env.development' : '.env';
+
+dotenv.config({
+  path: path.resolve(process.cwd(), envFileName)
+});
+
+console.log(`[Config] Iniciando en modo: ${env}`);
+console.log(`[Config] Archivo de entorno cargado: ${envFileName}`);
+
 const app: Application = express();
 
 const whitelist = ['http://localhost:3000','http://localhost:5173'];
@@ -46,7 +61,7 @@ app.use(
       'Accept',
       'X-Requested-With',
     ],
-    exposedHeaders: ['X-New-CSRF-Token']
+    exposedHeaders: ['x-csrf-token', 'X-New-CSRF-Token']
   }),
 );
 // Responder explícitamente a OPTIONS antes que a otros middlewares
@@ -76,6 +91,7 @@ app.use('/api/v1/location', locationRoutes);
 app.use('/api/v1/anonymous', anonymusRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/dish', dishRoutes);
+app.use('/api/v1/csrf', csrfRoutes);
 //Logger de errores para capturarlos s
 app.use(errorLogger);
 //Envio errores a Cliente
