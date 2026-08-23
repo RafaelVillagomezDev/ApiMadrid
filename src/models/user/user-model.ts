@@ -2,7 +2,7 @@ import { UserInterface } from '../../types/user-type';
 
 import { pool } from '../../connection/bd';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { createUser, getUserByEmail} from '../../queries/user-query';
+import { createUser, getUserByEmail, getUserById} from '../../queries/user-query';
 
 const promisePool = pool.promise();
 
@@ -52,7 +52,6 @@ class User implements UserInterface {
    static async findByEmail(email: string): Promise<User | null> {
     const query = getUserByEmail();
     
-    // Usamos RowDataPacket[] para tipar el resultado de un SELECT
     const [rows] = await promisePool.query<RowDataPacket[]>(query, [email]);
 
     if (rows.length === 0) {
@@ -60,6 +59,26 @@ class User implements UserInterface {
     }
 
    
+    const userData = rows[0];
+    
+    return new User({
+      id: userData.id,
+      email: userData.email,
+      name: userData.name,
+      surname: userData.surname,
+      password: userData.password,
+      role: userData.role,
+    });
+  }
+
+  static async findById(id: string): Promise<User | null> {
+    const query = getUserById();
+    const [rows] = await promisePool.query<RowDataPacket[]>(query, [id]);
+
+    if (rows.length === 0) {
+      return null; 
+    }
+
     const userData = rows[0];
     
     return new User({

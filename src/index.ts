@@ -7,6 +7,7 @@ import menuRoutes from './routes/v1/menu-routes';
 import dishRoutes from './routes/v1/dish-routes';
 import userRoutes from './routes/v1/user-routes';
 import csrfRoutes from './routes/v1/csrf-routes';
+import authRoutes from './routes/v1/auth-routes';
 import cors from 'cors';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -15,6 +16,7 @@ import { errorLogger } from './middleware/error-middleware';
 import { errorHandler } from './middleware/error-handler';
 import { apiLimiter } from './middleware/rate-limit-middleware';
 import { csrfProtection, initCookieParser } from './auth/auth-csrf';
+
 
 
 
@@ -92,6 +94,7 @@ app.use('/api/v1/anonymous', anonymusRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/dish', dishRoutes);
 app.use('/api/v1/csrf', csrfRoutes);
+app.use('/api/v1/auth', authRoutes);
 //Logger de errores para capturarlos s
 app.use(errorLogger);
 //Envio errores a Cliente

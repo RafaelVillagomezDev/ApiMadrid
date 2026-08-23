@@ -15,7 +15,13 @@ const createUser = (): string => {
 };
 
 const getUserByEmail = (): string => {
-  return `SELECT id, email, name, surname, password, role FROM USERS WHERE email = ?`;
+  const query = `SELECT id, email, name, surname, password, role FROM USERS WHERE email = ?`;
+  return query;
 };
 
-export { isUser, createUser,getUserByEmail };
+const getUserById = (): string => {
+  const query = `SELECT id, email, name, surname, password, role FROM USERS WHERE id = ?`;
+  return query;
+};
+
+export { isUser, createUser,getUserByEmail, getUserById };

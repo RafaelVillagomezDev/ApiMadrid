@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { addToken } from '../../src/models/blacklist/blacklist-model';
-
+import { RefreshToken } from '../../src/models/auth/refresh-token-model';
 
 interface JwtPayload {
   jti: string;
@@ -8,12 +8,10 @@ interface JwtPayload {
   id_user: string | number;
 }
 
-
 interface AuthRequest extends Request {
   user?: JwtPayload;
 }
 
-// 3. Usas AuthRequest en lugar de Request
 export const revokeSession = async (req: AuthRequest, res: Response) => {
   try {
    
@@ -27,6 +25,7 @@ export const revokeSession = async (req: AuthRequest, res: Response) => {
 
     const { jti, exp, id_user } = userPayload;
 
+   
     const expiresAt = new Date(exp * 1000)
       .toISOString()
       .slice(0, 19)
@@ -39,12 +38,19 @@ export const revokeSession = async (req: AuthRequest, res: Response) => {
       `El usuario ${id_user} cerró sesión`,
     );
 
-    // Limpieza de cookies
-    res.clearCookie('anonymousRefreshToken', {
+    
+    await RefreshToken.deleteAllTokensByUser(String(id_user));
+
+    
+    res.clearCookie('userRefreshToken', {
       httpOnly: true,
-      path: '/',
-      secure: true, // Descomenta si usas HTTPS en producción
-       sameSite: 'strict'
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: 'none', 
+      path: '/api/v1/auth/refresh' 
+    });
+
+    res.clearCookie('_csrf_token', { 
+        path: '/' 
     });
 
     return res.status(200).json({
