@@ -9,7 +9,7 @@ import { UserFactory } from '../factory/user-factory';
 import bcrypt from 'bcrypt';
 import { User } from '../models/user/user-model';
 import { cookieConfig } from '../auth/auth-csrf';
-
+import { RefreshToken } from '../models/auth/refresh-token-model'; 
 
 const UserController = {
     loginUser: async (
@@ -45,7 +45,7 @@ const UserController = {
                 return;
             }
 
-            // 4. Creamos el payload con los datos REALES de la base de datos
+
             const payloadData: UserData = {
                 id_user: userDB.id!,
                 email: userDB.email,
@@ -54,21 +54,35 @@ const UserController = {
             };
             const accessToken = await tokenSign(payloadData);
 
-            // 🔥 NUEVO: Rotamos el token CSRF automáticamente en el Login
+         
+            const refreshTokenString = crypto.randomBytes(64).toString('hex');
+  
+            await RefreshToken.saveToken(userDB.id!, refreshTokenString, 7);
+
+         
+            res.cookie('userRefreshToken', refreshTokenString, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', 
+                sameSite: 'none', // O 'strict' si no hay cross-domain
+                path: '/api/v1/auth/refresh', // Solo se enviará a esta ruta
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días en milisegundos
+            });
+
+      
             const newCsrfToken = crypto.randomBytes(32).toString('hex');
             
-            // 1. Limpiamos la anterior para forzar la actualización en el navegador
+        
             res.clearCookie('_csrf_token', { path: '/' });
             
-            // 2. Usamos EXACTAMENTE la misma configuración dinámica exportada
+         
             res.cookie('_csrf_token', newCsrfToken, cookieConfig);
 
-            // Exponemos el nuevo token en los headers para que el frontend lo actualice
+            
             res.setHeader('X-New-CSRF-Token', newCsrfToken);
             res.setHeader('x-csrf-token', newCsrfToken);
             res.setHeader('Access-Control-Expose-Headers', 'x-csrf-token, X-New-CSRF-Token');
 
-            // Enviamos la respuesta final (opcionalmente incluyes el csrfToken en el data si tu frontend lo usa así)
+            
             res.status(200).send({
                 message: 'Acceso usuario concedido.',
                 data: { 
@@ -108,7 +122,7 @@ const UserController = {
                 role: 'cliente',
             };
 
-               await UserFactory.createUser(user);
+            await UserFactory.createUser(user);
 
             res.status(201).send({
                 message: 'Usuario creado con éxito.',
@@ -123,5 +137,3 @@ const UserController = {
 };
 
 export default UserController;
-
-
