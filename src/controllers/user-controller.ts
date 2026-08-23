@@ -73,7 +73,6 @@ const UserController = {
                 message: 'Acceso usuario concedido.',
                 data: { 
                     user: { token: accessToken },
-                    csrfToken: newCsrfToken // Facilitamos al frontend que actualice su estado
                 }, 
                 code: 200,
             });
