@@ -18,7 +18,6 @@ const CsrfController = {
             // 2. Preparamos la respuesta para el frontend
             const response: ApiResponseInterface = {
                 message: 'Token CSRF generado con éxito',
-                data: { csrfToken: csrfToken },
                 code: 200,
             };
 
