@@ -64,7 +64,7 @@ const UserController = {
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
                 path: '/api/v1/auth/refresh',
-                maxAge: 300 * 1000 // 🔥 300 * 1000 para exactamente 5 minutos
+                maxAge: 30*60* 1000 // 🔥 30*60* 1000 para exactamente 30 minutos
             });
 
 

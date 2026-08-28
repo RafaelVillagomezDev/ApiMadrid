@@ -20,7 +20,7 @@ export const tokenSign = async ({ id_user, email, rol, jti }: UserData) => {
     },
     SECRET_TOKEN,
     {
-      expiresIn: '10s', // Duración del Token de Acceso
+      expiresIn: '30m', // Duración del Token de Acceso
     },
   );
   return sign;
@@ -28,16 +28,14 @@ export const tokenSign = async ({ id_user, email, rol, jti }: UserData) => {
 
 export const verifyToken = async (
   token: string,
-): Promise<JWTPayload | null> => {
+): Promise<JWTPayload> => {
   const SECRET_TOKEN = process.env.JWT_SECRET;
+  
   if (!SECRET_TOKEN) {
     throw new Error('JWT_SECRET no está definido en las variables de entorno.');
   }
 
-  try {
-    const decodedToken = jsonwebtoken.verify(token, SECRET_TOKEN);
-    return decodedToken as JWTPayload;
-  } catch (e) {
-    return null;
-  }
+  const decodedToken = jsonwebtoken.verify(token, SECRET_TOKEN);
+  
+  return decodedToken as JWTPayload; 
 };

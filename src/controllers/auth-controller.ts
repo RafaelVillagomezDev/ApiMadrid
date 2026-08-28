@@ -59,7 +59,7 @@ const AuthController = {
                 // 🔥 SOLUCIÓN: Usar la misma lógica dinámica que en el login
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', 
                 path: '/api/v1/auth/refresh', 
-                maxAge: 120 * 1000 // Ponlo a 2 minutos para que coincida con tu prueba
+                maxAge: 30*60* 1000 // Ponlo a 60 minutos para que coincida con tu prueba
             });
             
             res.status(200).json({

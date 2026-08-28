@@ -1,8 +1,6 @@
 const createRefreshTokenQuery = (): string => {
-
-    const query = `INSERT INTO REFRESH_TOKENS (user_id, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))`;
-    return query;
-}
+  return 'INSERT INTO `refresh_tokens` (`user_id`, `token`, `expires_at`) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ? DAY));';
+};
 
 const findValidTokenQuery = (): string => {
 
