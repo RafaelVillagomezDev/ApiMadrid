@@ -11,28 +11,28 @@ const ImageSchema = {
   create: checkSchema({
     relatedId: {
       in: ['params'],
-      errorMessage: 'Id debe ser un UUID válido',
-      isUUID: true,
+      isUUID: {
+        options: 4,
+        errorMessage: 'El ID debe ser un formato UUID v4 válido',
+      },
     },
+
     relatedType: {
       in: ['params'],
-      errorMessage: 'Tipo relacionado inválido ',
       trim: true,
       escape: true,
-      exists: {
-        options: {
-          checkNull: true,
-          checkFalsy: true,
-        },
-        errorMessage: 'El tipo relacionado es  obligatorio',
+      notEmpty: {
+        errorMessage: 'El tipo relacionado es obligatorio',
       },
-      optional: {
-        options: { nullable: true },
+      matches: {
+        options: /^[a-z_]+$/,
+        errorMessage: 'El tipo relacionado tiene un formato inválido (solo letras minúsculas)',
       },
       isLength: {
-        options: { max: 30 },
-        errorMessage: 'El nombre debe tener máximo 30 caracteres',
+        options: { min: 3, max: 30 },
+        errorMessage: 'El tipo relacionado debe tener entre 3 y 30 caracteres',
       },
+
       custom: {
         options: validateRelatedType,
       },

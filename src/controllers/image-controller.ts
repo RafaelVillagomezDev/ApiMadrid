@@ -5,14 +5,12 @@ import { ApiResponseInterface } from '../types/api-type';
 import { ImageInterface } from '../types/image-type';
 import { ImageFactory } from '../factory/image-factory';
 
-// Definición de una interfaz para los resultados de Cloudinary adjuntos por el middleware
 interface CloudinaryResult {
   secure_url: string;
   public_id: string;
-  // Otros campos de Cloudinary que necesites
 }
 
-// Extender la interfaz Request para incluir los resultados procesados
+
 interface CustomRequest extends Request {
   cloudinaryResults?: CloudinaryResult[];
 }
@@ -26,13 +24,11 @@ const ImageController = {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        res
-          .status(400)
-          .json({
-            message: 'Error de validación',
-            data: errors.array(),
-            code: 400,
-          });
+        res.status(400).json({
+          message: 'Error de validación',
+          data: errors.array(),
+          code: 400,
+        });
         return;
       }
 
@@ -40,36 +36,35 @@ const ImageController = {
       const cloudinaryResults = req.cloudinaryResults;
 
       if (!cloudinaryResults || cloudinaryResults.length === 0) {
-        res
-          .status(400)
-          .json({ message: 'No hay imágenes procesadas.', code: 400 });
+        res.status(400).json({ message: 'No hay imágenes procesadas.', code: 400 });
         return;
       }
 
-      const createdImages = [];
-      for (const result of cloudinaryResults) {
-        // 🚀 OPTIMIZACIÓN CRÍTICA: Transformación al vuelo
-        // Insertamos f_auto (formato automático como WebP) y q_auto (calidad automática)
-        // Reemplazamos "/upload/" por "/upload/f_auto,q_auto/"
+  
+      const imagesToCreate: ImageInterface[] = cloudinaryResults.map((result) => {
         const optimizedUrl = result.secure_url.replace(
           '/upload/',
           '/upload/f_auto,q_auto/',
         );
 
-        const image: ImageInterface = {
+        return {
           id: uuidv4(),
           relatedId,
           relatedType,
-          url: optimizedUrl, // Guardamos la URL ya optimizada
+          url: optimizedUrl,
         };
+      });
 
-        const newImageRecord = await ImageFactory.createImage(image);
-        createdImages.push(newImageRecord);
-      }
+      // OPTIMIZACIÓN: Ejecutamos todas las inserciones a la vez (en paralelo)
+      await Promise.all(
+        imagesToCreate.map((image) => ImageFactory.createImage(image))
+      );
 
-      res.status(200).json({
+      
+      res.status(201).json({
         message: 'Imágenes creadas y optimizadas con éxito.',
-        code: 200,
+        data: imagesToCreate as unknown as Record<string, unknown>[],
+        code: 201,
       });
     } catch (error) {
       next(error);

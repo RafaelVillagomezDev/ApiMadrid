@@ -1,9 +1,8 @@
-import { ImageInterface } from '../../types/image-type';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { pool } from '../../connection/bd';
-import { ResultSetHeader } from 'mysql2';
+import { ImageInterface } from '../../types/image-type';
 import { existImage, createImage } from '../../queries/image-query';
 
-// Obtener el pool de promesas
 const promisePool = pool.promise();
 
 class Image implements ImageInterface {
@@ -20,11 +19,15 @@ class Image implements ImageInterface {
   }
 
   async createImage(): Promise<number> {
+
     const connection = await promisePool.getConnection();
-    await connection.beginTransaction();
 
     try {
+
+      await connection.beginTransaction();
+
       const queryCreate = createImage();
+
 
       const [result] = await connection.query<ResultSetHeader>(queryCreate, [
         this.id,
@@ -34,31 +37,32 @@ class Image implements ImageInterface {
       ]);
 
       if (result.affectedRows === 0) {
-        throw new Error('No se pudo crear la imagen');
+        throw new Error('No se pudo crear la imagen en la base de datos');
       }
 
+
       await connection.commit();
-      connection.release();
 
       return result.affectedRows;
     } catch (error) {
+      
       await connection.rollback();
-      connection.release();
       throw error;
+    } finally {
+
+      connection.release();
     }
   }
 
-  async existImage(): Promise<number> {
+  async existImage(): Promise<boolean> {
     const queryExist = existImage();
 
-    // Ejecutar la consulta usando el pool de promesas
-    const [rows]: [any[], any] = await promisePool.query(queryExist, [this.id]);
 
-    if (rows.length > 0) {
-      throw new Error('Ya existe esa imagen en nuestra bbdd');
-    }
+    const [rows] = await promisePool.query<RowDataPacket[]>(queryExist, [
+      this.id,
+    ]);
 
-    return rows.length;
+    return rows.length > 0;
   }
 }
 
