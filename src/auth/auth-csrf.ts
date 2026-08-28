@@ -53,35 +53,43 @@ export const csrfProtection = (
   
   const isSafeMethod = ['GET', 'HEAD', 'OPTIONS'].includes(req.method);
 
-  // 1. Obtener los tokens (Usamos signedCookies para máxima seguridad)
+  // Obtener los tokens (Usamos signedCookies para máxima seguridad)
   let cookieToken = req.signedCookies[CSRF_COOKIE_NAME];
-  const headerToken = req.headers[CSRF_HEADER_NAME];
+  
+  // 🔥 Limpieza segura del header: previene errores si el frontend envía el token duplicado (con comas o como array)
+  let rawHeaderToken = req.headers[CSRF_HEADER_NAME];
+  let headerToken: string | undefined;
 
+  if (Array.isArray(rawHeaderToken)) {
+    headerToken = rawHeaderToken[0];
+  } else if (typeof rawHeaderToken === 'string') {
+    headerToken = rawHeaderToken.split(',')[0].trim();
+  }
+
+  // Si no hay cookie o estamos en una ruta de generación de token
   if (!cookieToken || isGeneratingToken) {
     cookieToken = generateToken();
 
-    // 🔥 Limpiamos la anterior para forzar la actualización en el navegador
-    res.clearCookie(CSRF_COOKIE_NAME, { path: '/' });
-
-    // Guardamos el token de forma ultra segura usando la configuración dinámica
+    // Guardamos el token de forma ultra segura usando la configuración dinámica (sobrescribe automáticamente la anterior)
     res.cookie(CSRF_COOKIE_NAME, cookieToken, cookieConfig);
 
     // 🔥 LA CLAVE: Enviamos el token limpio en la cabecera de respuesta HTTP
     res.setHeader('X-New-CSRF-Token', cookieToken);
     
-    // 🔥 Guardamos en res.locals para que el CsrfController pueda leerlo y no se vaya al catch
+    // Guardamos en res.locals para que el controlador final pueda leerlo
     res.locals.csrfToken = cookieToken;
 
     if (isGeneratingToken) return next();
   }
 
+  // Si es un método de solo lectura, dejamos pasar sin validar el token
   if (isSafeMethod) return next();
 
-  // 2. Validación estricta para métodos de escritura (POST, PUT, DELETE)
+  //  Validación estricta para métodos de escritura (POST, PUT, DELETE)
   if (!headerToken || !cookieToken || cookieToken !== headerToken) {
     console.error({
       alerta: '[CSRF Fallo]',
-      headerRecibido: headerToken || 'UNDEFINED (El frontend no lo envió en los headers)',
+      headerRecibido: headerToken || 'UNDEFINED (El frontend no lo envió o lo envió mal)',
       cookieRecibida: cookieToken || 'UNDEFINED (El navegador no envió la cookie)',
       sonIguales: cookieToken === headerToken,
       entorno: process.env.NODE_ENV

@@ -31,7 +31,7 @@ class RefreshToken implements RefreshTokenInterface {
       
       const [result] = await conn.execute<ResultSetHeader>(
         createRefreshTokenQuery(), 
-        [userId, token, 2] // 🔥 Pasamos 2 para que MySQL sume 2 minutos a SU propio reloj
+        [userId, token, expiresInDays] // 🔥 Pasamos 2 para que MySQL sume 2 minutos a SU propio reloj
       );
       
       if (result.affectedRows === 0) {
