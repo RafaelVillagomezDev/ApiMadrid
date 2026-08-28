@@ -11,7 +11,7 @@ let isCloudinaryConfigured = true;
 
 // --- CONFIGURACIÓN DE SEGURIDAD ---
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB límite
-const ALLOWED_MIMETYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const ALLOWED_MIMETYPES = ['image/jpeg', 'image/png', 'image/webp','image/jpg'];
 const MAX_PIXELS = 10000000; // 10MP para evitar ataques de agotamiento de RAM
 
 // Optimizamos Sharp para no colapsar el CPU en ataques DoS
