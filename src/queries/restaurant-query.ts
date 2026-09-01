@@ -80,12 +80,12 @@ const getRestaurantData = ({
   address,
   type_food,
   limit,
-  offset,
+  page,
 }: any) => {
   const conditions: string[] = [];
   const filterValues: any[] = [];
 
-  if (id) { conditions.push(`r.id = ?`); filterValues.push(id); } 
+  if (id) { conditions.push(`r.id = ?`); filterValues.push(id); }
   if (name) { conditions.push(`r.name LIKE ?`); filterValues.push(`%${name}%`); }
   if (address) { conditions.push(`r.address LIKE ?`); filterValues.push(`%${address}%`); }
 
@@ -103,9 +103,12 @@ const getRestaurantData = ({
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-  // Por defecto el límite es 6
-  const safeLimit = Math.max(0, parseInt(limit) || 6); 
-  const safeOffset = Math.max(0, parseInt(offset) || 0);
+  // 🔥 Calculamos el limit y la página de forma segura
+  const safeLimit = Math.max(1, parseInt(limit) || 6); // Mínimo 1 para evitar errores de división
+  const safePage = Math.max(1, parseInt(page) || 1);
+
+  // 🔥 Convertimos la página en el Offset que necesita MySQL
+  const safeOffset = (safePage - 1) * safeLimit;
 
   const restaurantBaseQuery = `
     SELECT 
@@ -121,6 +124,7 @@ const getRestaurantData = ({
     LIMIT ?, ?;
   `.trim();
 
+  // El array de valores inyecta el offset calculado y el limit
   const baseValues = [...filterValues, safeOffset, safeLimit];
 
   const imagesQuery = `SELECT id AS image_id, url AS image_url, relatedId FROM images WHERE relatedId IN (?);`;
@@ -145,10 +149,10 @@ const getRestaurantData = ({
     imagesQuery,
     paymentsQuery,
     menusAndDishesQuery,
-    safeLimit 
+    safeLimit,
+    safePage
   };
 };
-
 
 
 
