@@ -79,7 +79,7 @@ const RestaurantController = {
   },
 getRestaurants: async (
     req: Request,
-    res: Response<ApiResponseInterface | any>, 
+    res: Response<ApiResponseInterface | any>,
     next: NextFunction,
   ): Promise<void> => {
     try {
@@ -95,7 +95,6 @@ getRestaurants: async (
         return;
       }
 
-      // includeOptionals: true asegura que los filtros que no se envíen queden como undefined o null
       const validData = matchedData(req, { includeOptionals: true });
 
       const queryData: RestaurantQueryPagination = {
@@ -107,25 +106,29 @@ getRestaurants: async (
         offset: validData.offset,
       };
 
-      // Aquí tu Factory ejecuta las queries y retorna { data: finalData, total: total_items }
       const data = await RestaurantFactory.getRestaurant(queryData);
 
-      // Definimos el límite actual (si no viene en la request, es 6 por defecto)
+      //  Valores seguros para límite y offset (por si no se envían)
       const currentLimit = Math.max(0, parseInt(validData.limit) || 6);
+      const currentOffset = Math.max(0, parseInt(validData.offset) || 0);
 
-      //  Calculamos las métricas de paginación
+      //  Cálculos de paginación
       const total_items = data.total || 0;
       const page_items = data.data ? data.data.length : 0;
       const total_pages = Math.ceil(total_items / currentLimit);
+      
+      
+      const current_page = Math.floor(currentOffset / currentLimit) + 1;
 
-      // Estructuramos la respuesta añadiendo los campos solicitados
+      //  Respuesta
       const response = {
         message: 'Restaurantes obtenidos con éxito', 
         data: data.data,
         code: 200,
         total_items: total_items,
         page_items: page_items,
-        total_pages: total_pages
+        total_pages: total_pages,
+        current_page: current_page 
       };
 
       res.status(200).send(response);
