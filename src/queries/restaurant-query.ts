@@ -85,25 +85,10 @@ const getRestaurantData = ({
   const conditions: string[] = [];
   const filterValues: any[] = [];
 
-  // 1. Filtro por ID
-  if (id) {
-    conditions.push(`id = ?`);
-    filterValues.push(id);
-  }
+  if (id) { conditions.push(`r.id = ?`); filterValues.push(id); } 
+  if (name) { conditions.push(`r.name LIKE ?`); filterValues.push(`%${name}%`); }
+  if (address) { conditions.push(`r.address LIKE ?`); filterValues.push(`%${address}%`); }
 
-  // 2. Filtro por Nombre
-  if (name) {
-    conditions.push(`name LIKE ?`);
-    filterValues.push(`%${name}%`);
-  }
-
-  // 3. Filtro por Dirección
-  if (address) {
-    conditions.push(`address LIKE ?`);
-    filterValues.push(`%${address}%`);
-  }
-
-  // 4. Filtro por Tipo de Comida
   if (type_food) {
     const foodArray = Array.isArray(type_food)
       ? type_food.filter(t => t && String(t).trim() !== "")
@@ -111,17 +96,17 @@ const getRestaurantData = ({
 
     if (foodArray.length > 0) {
       const placeholders = foodArray.map(() => 'LOWER(?)').join(', ');
-      conditions.push(`LOWER(type_food) IN (${placeholders})`);
+      conditions.push(`LOWER(r.type_food) IN (${placeholders})`);
       foodArray.forEach(t => filterValues.push(String(t).trim().toLowerCase()));
     }
   }
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-  const safeLimit = Math.max(0, parseInt(limit) || 10);
+  // Por defecto el límite es 6
+  const safeLimit = Math.max(0, parseInt(limit) || 6); 
   const safeOffset = Math.max(0, parseInt(offset) || 0);
 
-  // --- QUERY 1: La base (Solo restaurantes paginados + su localización 1:1) ---
   const restaurantBaseQuery = `
     SELECT 
       r.id AS restaurant_id, r.name AS restaurant_name, r.email AS restaurant_email,
@@ -138,16 +123,13 @@ const getRestaurantData = ({
 
   const baseValues = [...filterValues, safeOffset, safeLimit];
 
-  // --- QUERIES SECUNDARIAS (Se ejecutarán dinámicamente usando IN (?)) ---
   const imagesQuery = `SELECT id AS image_id, url AS image_url, relatedId FROM images WHERE relatedId IN (?);`;
-
   const paymentsQuery = `
     SELECT rp.restaurant_id, mp.id AS payment_method_id, mp.name AS payment_method_name, mp.icon_url AS payment_method_icon
     FROM RESTAURANT_PAYMENTS rp
     INNER JOIN METHODS_PAYMENT mp ON rp.method_payment_id = mp.id
     WHERE rp.restaurant_id IN (?);
   `.trim();
-
   const menusAndDishesQuery = `
     SELECT m.restaurant_id, m.id AS menu_id, m.name AS menu_name, m.description AS menu_description,
            d.id AS dish_id, d.name AS dish_name, d.description AS dish_description, d.price AS dish_price, d.category AS dish_category
@@ -162,7 +144,8 @@ const getRestaurantData = ({
     baseValues,
     imagesQuery,
     paymentsQuery,
-    menusAndDishesQuery
+    menusAndDishesQuery,
+    safeLimit 
   };
 };
 

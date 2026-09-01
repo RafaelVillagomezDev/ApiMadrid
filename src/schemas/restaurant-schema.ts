@@ -1,4 +1,4 @@
-import { checkSchema } from 'express-validator';
+import { checkSchema,checkExact } from 'express-validator';
 import { pool } from '../connection/bd';
 import { isRestaurant } from '../queries/restaurant-query';
 
@@ -125,118 +125,119 @@ const RestaurantSchema = {
       },
     },
   }),
-  get: checkSchema({
-    id: {
-      in: ['params'],
-      isUUID: {
-        errorMessage: 'Id debe ser un UUID válido',
-      },
-      optional: true,
-      custom: {
-        options: async (value) => {
-          const [rows]: [any[], any] = await promisePool.query(isRestaurant(), [
-            value,
-          ]);
+ get: checkExact(
+    checkSchema({
+      id: {
+        in: ['params'],
+        isUUID: {
+          errorMessage: 'Id debe ser un UUID válido',
+        },
+        optional: true,
+        custom: {
+          options: async (value) => {
+            const [rows]: [any[], any] = await promisePool.query(isRestaurant(), [
+              value,
+            ]);
 
-          if (rows.length === 0) {
-            throw new Error(
-              'No existe un restaurante con ese ID en la base de datos',
-            );
-          }
+            if (rows.length === 0) {
+              throw new Error(
+                'No existe un restaurante con ese ID en la base de datos',
+              );
+            }
 
-          return true;
+            return true;
+          },
         },
       },
-    },
-    name: {
-      in: ['query'],
-      optional: true,
-      errorMessage: 'Nombre inválido',
-      isLength: {
-        options: { max: 30 },
-        errorMessage: 'El nombre debe tener máximo 30 caracteres',
+      name: {
+        in: ['query'],
+        optional: true,
+        errorMessage: 'Nombre inválido',
+        isLength: {
+          options: { max: 30 },
+          errorMessage: 'El nombre debe tener máximo 30 caracteres',
+        },
+        matches: {
+          options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{4,}$/,
+          errorMessage:
+            'El nombre debe tener al menos 4 caracteres alfanuméricos',
+        },
       },
-      matches: {
-        options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{4,}$/,
-        errorMessage:
-          'El nombre debe tener al menos 4 caracteres alfanuméricos',
+      address: {
+        in: ['query'],
+        optional: true,
+        errorMessage: 'Dirección inválida',
+        trim: true,
+        escape: true,
+        isLength: {
+          options: { max: 50 },
+          errorMessage: 'La dirección debe tener máximo 50 caracteres',
+        },
+        matches: {
+          options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{4,}$/,
+          errorMessage:
+            'La dirección debe tener al menos 4 caracteres alfanuméricos',
+        },
       },
-    },
-    address: {
-      in: ['query'],
-      optional: true,
-      errorMessage: 'Dirección inválida',
-      trim: true,
-      escape: true,
-      isLength: {
-        options: { max: 50 },
-        errorMessage: 'La dirección debe tener máximo 50 caracteres',
-      },
-      matches: {
-        options: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{4,}$/,
-        errorMessage:
-          'La dirección debe tener al menos 4 caracteres alfanuméricos',
-      },
-    },
-   type_food: {
-      in: ['query'],
-      optional: true,
-      errorMessage: 'Tipo de comida inválido',
-     
-      customSanitizer: {
-        options: (value) => {
-          if (!value) return [];
-          const array = Array.isArray(value) ? value : [value];
-  
-          return array.map(t => String(t).trim().toLowerCase()).filter(t => t !== "");
-        }
-      },
-      
-      custom: {
-        options: (value) => {
-        
-          if (!Array.isArray(value)) return true;
-          
-          const validOptions = ['italiana', 'china', 'mexicana', 'japonesa', 'india', 'mediterranea', 'española', 'turca'];
-          const allValid = value.every(t => validOptions.includes(t));
-          if (!allValid) {
-            throw new Error(`Los tipos de comida deben ser opciones válidas: ${validOptions.join(', ')}`);
+      type_food: {
+        in: ['query'],
+        optional: true,
+        errorMessage: 'Tipo de comida inválido',
+        customSanitizer: {
+          options: (value) => {
+            if (!value) return [];
+            const array = Array.isArray(value) ? value : [value];
+            return array.map(t => String(t).trim().toLowerCase()).filter(t => t !== "");
           }
-          return true;
+        },
+        custom: {
+          options: (value) => {
+            if (!Array.isArray(value) || value.length === 0) return true;
+            
+            const validOptions = ['italiana', 'china', 'mexicana', 'japonesa', 'india', 'mediterranea', 'española', 'turca'];
+            const allValid = value.every(t => validOptions.includes(t));
+            if (!allValid) {
+              throw new Error(`Los tipos de comida deben ser opciones válidas: ${validOptions.join(', ')}`);
+            }
+            return true;
+          }
         }
-      }
-    },
-    limit: {
-      in: ['query'],
-      optional: true,
-      errorMessage: 'Limite invalido',
-      trim: true,
-      escape: true,
-      isLength: {
-        options: { max: 2 },
-        errorMessage: 'El limite debe tener como maximo 2 cifras',
       },
-      isInt: {
-        errorMessage: 'El limite es invalido debe ser un entero',
+      limit: {
+        in: ['query'],
+        optional: true,
+        errorMessage: 'Limite invalido',
+        trim: true,
+        escape: true,
+        isLength: {
+          options: { max: 2 },
+          errorMessage: 'El limite debe tener como maximo 2 cifras',
+        },
+        isInt: {
+          errorMessage: 'El limite es invalido debe ser un entero',
+        },
+        toInt: true,
       },
-      toInt: true,
-    },
-    offset: {
-      in: ['query'],
-      optional: true,
-      errorMessage: 'Paginación invalida',
-      trim: true,
-      escape: true,
-      isLength: {
-        options: { max: 2 },
-        errorMessage: 'La paginación debe tener como maximo 2 cifras',
+      offset: {
+        in: ['query'],
+        optional: true,
+        errorMessage: 'Paginación invalida',
+        trim: true,
+        escape: true,
+        isLength: {
+          options: { max: 2 },
+          errorMessage: 'La paginación debe tener como maximo 2 cifras',
+        },
+        isInt: {
+          errorMessage: 'La paginación es invalida debe ser un entero',
+        },
+        toInt: true,
       },
-      isInt: {
-        errorMessage: 'La paginación es invalida debe ser un entero',
-      },
-      toInt: true,
-    },
-  }),
+    }),
+    {
+      message: 'Se han enviado parámetros no permitidos o mal escritos',
+    }
+  ),
   remove: checkSchema({
     id: {
       in: ['params'],
