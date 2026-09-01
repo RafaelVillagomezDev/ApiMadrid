@@ -77,58 +77,57 @@ const RestaurantController = {
       next(error);
     }
   },
-getRestaurants: async (
+  
+  getRestaurants: async (
     req: Request,
     res: Response<ApiResponseInterface | any>,
     next: NextFunction,
   ): Promise<void> => {
     try {
       const errors = validationResult(req);
-      const errorResponse: ApiResponseInterface = {
-        message: 'Error en validación',
-        data: errors.array(),
-        code: 400,
-      };
-
       if (!errors.isEmpty()) {
-        res.status(400).json(errorResponse);
+        res.status(400).json({
+          message: 'Error en validación',
+          data: errors.array(),
+          code: 400,
+        });
         return;
       }
 
       const validData = matchedData(req, { includeOptionals: true });
 
+      // 1. Valores seguros para paginación basados en 'page' y 'limit'
+      // Usamos Math.max(1, ...) para asegurarnos de que nunca sea 0 o negativo
+      const currentLimit = Math.max(1, parseInt(validData.limit) || 6);
+      const currentPage = Math.max(1, parseInt(validData.page) || 1);
+
+      // 2. Preparamos el queryData usando 'page'
       const queryData: RestaurantQueryPagination = {
         name: validData.name,
         id: validData.id,
         address: validData.address,
         type_food: validData.type_food,
-        limit: validData.limit,
-        offset: validData.offset,
+        limit: currentLimit,
+        page: currentPage, 
       };
 
+      // 3. Ejecutamos la consulta a través de la Factory
       const data = await RestaurantFactory.getRestaurant(queryData);
 
-      //  Valores seguros para límite y offset (por si no se envían)
-      const currentLimit = Math.max(0, parseInt(validData.limit) || 6);
-      const currentOffset = Math.max(0, parseInt(validData.offset) || 0);
-
-      //  Cálculos de paginación
+      // 4. Cálculos de paginación
       const total_items = data.total || 0;
       const page_items = data.data ? data.data.length : 0;
       const total_pages = Math.ceil(total_items / currentLimit);
-      
-      
-      const current_page = Math.floor(currentOffset / currentLimit) + 1;
 
-      //  Respuesta
+      // 5. Construcción de la respuesta
       const response = {
         message: 'Restaurantes obtenidos con éxito', 
-        data: data.data,
+        data: data.data || [],
         code: 200,
         total_items: total_items,
         page_items: page_items,
         total_pages: total_pages,
-        current_page: current_page 
+        current_page: currentPage 
       };
 
       res.status(200).send(response);
@@ -136,6 +135,7 @@ getRestaurants: async (
       next(error);
     }
   },
+
   removeRestaurant: async (
     req: Request,
     res: Response<ApiResponseInterface>,
@@ -143,14 +143,12 @@ getRestaurants: async (
   ): Promise<void> => {
     try {
       const errors = validationResult(req);
-      const errorResponse: ApiResponseInterface = {
-        message: 'Error en validación',
-        data: errors.array(),
-        code: 400,
-      };
-
       if (!errors.isEmpty()) {
-        res.status(400).json(errorResponse);
+        res.status(400).json({
+          message: 'Error en validación',
+          data: errors.array(),
+          code: 400,
+        });
         return;
       }
 
@@ -163,7 +161,7 @@ getRestaurants: async (
       await RestaurantFactory.removeRestaurant(restaurant);
 
       const response: ApiResponseInterface = {
-        message: 'Restaurante eliiminado con éxito',
+        message: 'Restaurante eliminado con éxito',
         code: 200,
       };
 

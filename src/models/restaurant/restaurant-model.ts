@@ -25,7 +25,7 @@ class Restaurant implements RestaurantInterface {
   type_food?: string[];
   web?: string;
   limit?: number | undefined;
-  offset?: number | undefined;
+  page?: number | undefined; // 💡 Actualizado para mantener coherencia (antes offset)
 
   constructor({
     id,
@@ -37,7 +37,7 @@ class Restaurant implements RestaurantInterface {
     type_food,
     web,
     limit,
-    offset,
+    page, // 💡 Actualizado
   }: RestaurantInterface) {
     this.id = id;
     this.email = email;
@@ -48,7 +48,7 @@ class Restaurant implements RestaurantInterface {
     this.type_food = type_food;
     this.web = web;
     this.limit = limit;
-    this.offset = offset;
+    this.page = page; 
   }
 
   async createRestaurant(): Promise<number> {
@@ -84,74 +84,74 @@ class Restaurant implements RestaurantInterface {
     return rows.length;
   }
 
+  async getRestaurants(obj: RestaurantQueryPagination) {
+    const { id, name, address, type_food, limit, page } = obj;
 
+    // 💡 CORRECCIÓN 1: Pasamos 'page' en lugar de 'offset'
+    const queries = getRestaurantData({
+      id,
+      name,
+      address,
+      type_food,
+      limit,
+      page, 
+    });
 
- async getRestaurants(obj: RestaurantQueryPagination) {
-  const { id, name, address, type_food, limit, offset } = obj;
+    // Obtenemos la query de conteo total 
+    const [queryCount, countValues] = countTotalRestaurants({ id, name, address, type_food });
 
-  //  Obtenemos las queries estructuradas desde la función dinámica modificada
-  const queries = getRestaurantData({
-    id,
-    name,
-    address,
-    type_food,
-    limit,
-    offset,
-  });
+    // Ejecutamos la query base principal de restaurantes y el conteo total en paralelo
+    const [[restaurantsRows], [countRows]]: [any[], any] = await Promise.all([
+      promisePool.query(queries.restaurantBaseQuery, queries.baseValues),
+      promisePool.query(queryCount, countValues)
+    ]);
 
-  // Obtenemos la query de conteo total 
-  const [queryCount, countValues] = countTotalRestaurants({ id, name, address, type_food });
+    const total = countRows[0].total;
 
-  //  Ejecutamos la query base principal de restaurantes y el conteo total en paralelo
-  const [[restaurantsRows], [countRows]]: [any[], any] = await Promise.all([
-    promisePool.query(queries.restaurantBaseQuery, queries.baseValues),
-    promisePool.query(queryCount, countValues)
-  ]);
+    // 💡 CORRECCIÓN 2: Salida temprana elegante sin romper la app
+    if (!restaurantsRows || restaurantsRows.length === 0) {
+      // Devolvemos data vacía para que el frontend maneje el "No hay resultados"
+      return { data: [], total }; 
+    }
 
-  // Si no se encontraron resultados para los filtros aplicados en esta página
-  if (!restaurantsRows || restaurantsRows.length === 0) {
-    throw new Error('No existen restaurantes con esas condiciones');
+    // Extraemos los IDs únicos de los restaurantes encontrados en esta página
+    const restaurantIds = restaurantsRows.map((r: any) => r.restaurant_id);
+
+    // Lanzamos las queries relacionales secundarias de forma simultánea (IN (?))
+    const [[imagesRows], [paymentsRows], [menusAndDishesRows]]: [any[], any[], any[]] = await Promise.all([
+      promisePool.query(queries.imagesQuery, [restaurantIds]),
+      promisePool.query(queries.paymentsQuery, [restaurantIds]),
+      promisePool.query(queries.menusAndDishesQuery, [restaurantIds])
+    ]);
+
+    // Pasamos todos los buffers de datos al nuevo formateador optimizado O(N)
+    const data = formatRestaurantData({
+      restaurantsRows,
+      imagesRows,
+      paymentsRows,
+      menusAndDishesRows
+    });
+    
+    return {
+      data,
+      total
+    };
   }
-
-  //  Extraemos los IDs únicos de los restaurantes encontrados en esta página
-  const restaurantIds = restaurantsRows.map((r: any) => r.restaurant_id);
-
-  // Lanzamos las queries relacionales secundarias de forma simultánea (IN (?))
-  const [[imagesRows], [paymentsRows], [menusAndDishesRows]]: [any[], any[], any[]] = await Promise.all([
-    promisePool.query(queries.imagesQuery, [restaurantIds]),
-    promisePool.query(queries.paymentsQuery, [restaurantIds]),
-    promisePool.query(queries.menusAndDishesQuery, [restaurantIds])
-  ]);
-
-  // 5. Pasamos todos los buffers de datos al nuevo formateador optimizado O(N)
-  const data = formatRestaurantData({
-    restaurantsRows,
-    imagesRows,
-    paymentsRows,
-    menusAndDishesRows
-  });
-
-  const total = countRows[0].total;
-  
-  return {
-    data,
-    total
-  };
-}
 
   async removeRestaurants(): Promise<number> {
     const queryRemoveRestaurants = removeRestaurantsData();
 
-    const [rows]: [any[], any] = await promisePool.query(
+    // Un DELETE devuelve ResultSetHeader, no un array de rows
+    const [result] = await promisePool.query<ResultSetHeader>(
       queryRemoveRestaurants,
       [this.id],
     );
 
-    if (rows.length === 0) {
-      throw new Error('No existen restaurantes con esas condiciones');
+    if (result.affectedRows === 0) {
+      throw new Error('No existen restaurantes con esas condiciones para eliminar');
     }
 
-    return rows.length;
+    return result.affectedRows;
   }
 }
 

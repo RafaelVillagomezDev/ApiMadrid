@@ -218,20 +218,44 @@ const RestaurantSchema = {
         },
         toInt: true,
       },
-      offset: {
+       page: {
         in: ['query'],
         optional: true,
-        errorMessage: 'Paginación invalida',
+        errorMessage: 'Pagina invalida',
         trim: true,
         escape: true,
         isLength: {
-          options: { max: 2 },
-          errorMessage: 'La paginación debe tener como maximo 2 cifras',
+          options: { max: 5 },
+          errorMessage: 'El pagina debe tener como maximo 5 cifras',
         },
         isInt: {
-          errorMessage: 'La paginación es invalida debe ser un entero',
+          errorMessage: 'El pagina es invalida debe ser un entero',
         },
         toInt: true,
+      },
+      price: {
+        in: ['query'],
+        optional: true,
+        errorMessage: 'Precio inválido',
+        customSanitizer: {
+          options: (value) => {
+            if (!value) return [];
+            const array = Array.isArray(value) ? value : [value];
+            return array.map(t => String(t).trim().toLowerCase()).filter(t => t !== "");
+          }
+        },
+        custom: {
+          options: (value) => {
+            if (!Array.isArray(value) || value.length === 0) return true;
+            // Valida las opciones que definiste en tu frontend
+            const validOptions = ['bajo', 'medio', 'alto'];
+            const allValid = value.every(t => validOptions.includes(t));
+            if (!allValid) {
+              throw new Error(`Los precios deben ser opciones válidas: ${validOptions.join(', ')}`);
+            }
+            return true;
+          }
+        }
       },
     }),
     {

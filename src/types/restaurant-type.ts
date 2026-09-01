@@ -9,7 +9,7 @@ interface RestaurantInterface {
   web?: string;
   [key: string]: any;
   limit?: number;
-  offset?: number;
+  page?: number;
 }
 
 /**
@@ -33,7 +33,7 @@ interface RestaurantQueryPagination {
   address?: string;
   type_food?: string[];
   limit?: number;
-  offset?: number;
+  page?: number;
 }
 export {
   RestaurantInterface,
