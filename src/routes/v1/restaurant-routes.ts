@@ -17,7 +17,7 @@ router.post(
 );
 
 router.get(
-  '',
+  '/:id?',
   authToken,
   checkBlacklist,
   RestaurantSchema.get,
