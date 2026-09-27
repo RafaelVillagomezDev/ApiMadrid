@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { addToken } from '../../src/models/blacklist/blacklist-model';
-import { RefreshToken } from '../../src/models/auth/refresh-token-model';
+import { addToken } from '../models/blacklist/blacklist-model';
+import { RefreshToken } from '../models/auth/refresh-token-model';
 
 interface JwtPayload {
   jti: string;
