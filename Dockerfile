@@ -3,37 +3,40 @@ FROM node:22-bookworm-slim AS builder
 
 WORKDIR /app
 
-# Copiamos los archivos de dependencias
-COPY package*.json ./
+# Instalamos pnpm globalmente
+RUN npm install -g pnpm
 
-# Instalamos TODAS las dependencias (incluyendo devDependencies para poder compilar TypeScript)
-RUN npm install
+# Copiamos los archivos de dependencias
+COPY package.json pnpm-lock.yaml ./
+
+# Instalamos TODAS las dependencias usando el lockfile para consistencia
+RUN pnpm install --frozen-lockfile
 
 # Copiamos todo el código fuente
 COPY . .
 
 # Compilamos el código TypeScript a JavaScript (crea la carpeta dist)
-RUN npm run build
+RUN pnpm run build
 
 # Etapa 2: Producción (Imagen final ligera)
 FROM node:22-bookworm-slim
 
 WORKDIR /app
 
-# Copiamos solo los archivos de dependencias
-COPY package*.json ./
+# Instalamos pnpm en la imagen final
+RUN npm install -g pnpm
 
-# Instalamos SOLO las dependencias de producción (omite devDependencies, ahorrando mucho espacio)
-RUN npm install --omit=dev
+# Copiamos solo los archivos de dependencias
+COPY package.json pnpm-lock.yaml ./
+
+# Instalamos SOLO las dependencias de producción (omite las de desarrollo)
+RUN pnpm install --prod --frozen-lockfile
 
 # Copiamos la carpeta compilada desde la etapa anterior
 COPY --from=builder /app/dist ./dist
-
-# Si tienes archivos estáticos o vistas que no son TS, descomenta la siguiente línea y ajusta la ruta
-# COPY --from=builder /app/public ./public
 
 # Exponemos el puerto que usa Express
 EXPOSE 3000
 
 # Arrancamos usando tu script de producción
-CMD ["npm", "run", "production"]
+CMD ["pnpm", "run", "production"]
