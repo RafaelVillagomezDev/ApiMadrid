@@ -16,3 +16,6 @@ declare global {
     }
   }
 }
+
+// Obligatorio para que TypeScript lo reconozca como un módulo de declaraciones globales
+export {};
