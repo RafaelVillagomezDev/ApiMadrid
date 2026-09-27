@@ -10,7 +10,7 @@ RUN npm install -g pnpm
 COPY package.json pnpm-lock.yaml ./
 
 # 🔥 SOLUCIÓN: Permitimos explícitamente compilar bcrypt y sharp
-RUN echo 'onlyBuiltDependencies=["bcrypt", "sharp"]' > .npmrc
+RUN echo "onlyBuiltDependencies[]=bcrypt" > .npmrc && echo "onlyBuiltDependencies[]=sharp" >> .npmrc
 
 # Instalamos TODAS las dependencias usando el lockfile para consistencia
 RUN pnpm install --frozen-lockfile
@@ -33,7 +33,7 @@ RUN npm install -g pnpm
 COPY package.json pnpm-lock.yaml ./
 
 # 🔥 SOLUCIÓN: Repetimos el permiso para la etapa de producción
-RUN echo 'onlyBuiltDependencies=["bcrypt", "sharp"]' > .npmrc
+RUN echo "onlyBuiltDependencies[]=bcrypt" > .npmrc && echo "onlyBuiltDependencies[]=sharp" >> .npmrc
 
 # Instalamos SOLO las dependencias de producción (omite las de desarrollo)
 RUN pnpm install --prod --frozen-lockfile
