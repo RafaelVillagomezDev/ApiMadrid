@@ -80,7 +80,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-const port = process.env.PORT || 3000;
+const port: number = Number(process.env.PORT) || 3000;
 
 
 app.use(requestLogger);
@@ -102,6 +102,6 @@ app.use('/api/v1/auth', authRoutes);
 app.use(errorLogger);
 app.use(errorHandler);
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`[Server] Corriendo en el puerto ${port}`);
 });
