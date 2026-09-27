@@ -37,7 +37,7 @@ COPY --from=prod-deps /app/node_modules ./node_modules
 # Copiamos tu código compilado desde la Etapa 1
 COPY --from=builder /app/dist ./dist
 
-EXPOSE 3000
+EXPOSE 4000
 
 # Arrancamos la API usando npm nativo
 CMD ["npm", "run", "production"]
