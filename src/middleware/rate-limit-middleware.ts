@@ -1,5 +1,5 @@
 import { rateLimit } from 'express-rate-limit';
-import logger from '../../src/utils/logger';
+import logger from '../utils/logger';
 
 import { decode } from 'jsonwebtoken'; // O la librería que uses para JWT
 import { addToken } from '../models/blacklist/blacklist-model';
