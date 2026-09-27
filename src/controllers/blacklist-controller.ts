@@ -14,7 +14,7 @@ interface AuthRequest extends Request {
 
 export const revokeSession = async (req: AuthRequest, res: Response) => {
   try {
-   
+
     const userPayload = req.user;
 
     if (!userPayload || !userPayload.jti) {
@@ -25,7 +25,7 @@ export const revokeSession = async (req: AuthRequest, res: Response) => {
 
     const { jti, exp, id_user } = userPayload;
 
-   
+
     const expiresAt = new Date(exp * 1000)
       .toISOString()
       .slice(0, 19)
@@ -38,19 +38,21 @@ export const revokeSession = async (req: AuthRequest, res: Response) => {
       `El usuario ${id_user} cerró sesión`,
     );
 
-    
+
     await RefreshToken.deleteAllTokensByUser(String(id_user));
 
-    
+    const isProduction = process.env.NODE_ENV === 'production';
+
     res.clearCookie('userRefreshToken', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', 
-      sameSite: 'none', 
-      path: '/api/v1/auth/refresh' 
+      secure: isProduction,
+      sameSite: 'lax',
+      domain: isProduction ? '.yandrydev.cloud' : undefined, 
+      path: '/api/v1/auth/refresh'
     });
 
-    res.clearCookie('_csrf_token', { 
-        path: '/' 
+    res.clearCookie('_csrf_token', {
+      path: '/'
     });
 
     return res.status(200).json({

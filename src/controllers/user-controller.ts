@@ -58,15 +58,17 @@ const UserController = {
             const refreshTokenString = crypto.randomBytes(64).toString('hex');
 
             await RefreshToken.saveToken(userDB.id!, refreshTokenString, 2);
+            
+            const isProduction = process.env.NODE_ENV === 'production';
 
             res.cookie('userRefreshToken', refreshTokenString, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                secure: isProduction, // false en HTTP (local), true en HTTPS (Dokploy)
+                sameSite: 'lax',      // Mismo sitio, funciona perfecto en ambos entornos
+                domain: isProduction ? '.yandrydev.cloud' : undefined, // El puente entre tu web y la API
                 path: '/api/v1/auth/refresh',
-                maxAge: 30*60* 1000 // 🔥 30*60* 1000 para exactamente 30 minutos
+                maxAge: 30 * 60 * 1000 // 🔥 Exactamente 30 minutos
             });
-
 
             const newCsrfToken = crypto.randomBytes(32).toString('hex');
 

@@ -22,11 +22,12 @@ const isSecure = isProductionOrPre ? true : (envSameSite === 'none');
 
 // 3. Configuración centralizada de la cookie (EXPORTADA para usar en UserController.loginUser)
 export const cookieConfig: CookieOptions = {
-  httpOnly: true,     // 🔥 Blindado: El navegador protege la cookie contra ataques XSS
-  secure: isSecure,   // HTTPS obligatorio según el entorno
-  signed: true,       // Encriptado y firmado en el almacenamiento del navegador
-  sameSite: envSameSite,
-  maxAge: 30 * 60 * 1000, // 30 minutos
+  httpOnly: true,     
+  secure: isSecure,   
+  signed: true,       
+  sameSite: envSameSite, // Asegúrate de que tu lógica asigne 'lax' aquí en producción
+  domain: '.yandrydev.cloud', // El punto inicial permite compartir la cookie
+  maxAge: 30 * 60 * 1000, 
   path: '/',
 };
 

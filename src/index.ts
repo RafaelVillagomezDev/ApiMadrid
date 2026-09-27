@@ -28,6 +28,9 @@ console.log(`[Config] Iniciando en modo: ${env}`);
 
 const app: Application = express();
 
+// Proxy de Dokploy
+app.set('trust proxy', 1); 
+
 // --- SEGURIDAD: HELMET ---
 // Oculta "X-Powered-By: Express" y añade cabeceras de seguridad estrictas
 app.use(helmet());
@@ -72,8 +75,7 @@ app.use(
 app.options('*', cors());
 app.use(express.json());
 
-// Proxy de Dokploy
-app.set('trust proxy', 1); 
+
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
