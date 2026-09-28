@@ -130,8 +130,8 @@ const getRestaurantData = ({
   const imagesQuery = `SELECT id AS image_id, url AS image_url, relatedId FROM images WHERE relatedId IN (?);`;
   const paymentsQuery = `
     SELECT rp.restaurant_id, mp.id AS payment_method_id, mp.name AS payment_method_name, mp.icon_url AS payment_method_icon
-    FROM RESTAURANT_PAYMENTS rp
-    INNER JOIN METHODS_PAYMENT mp ON rp.method_payment_id = mp.id
+    FROM restaurant_payments rp
+    INNER JOIN methods_payment mp ON rp.method_payment_id = mp.id
     WHERE rp.restaurant_id IN (?);
   `.trim();
   const menusAndDishesQuery = `
