@@ -6,7 +6,7 @@ USE DB_APIMADRID;
 -- 1. Tablas independientes
 -- ----------------------------------------------------
 
-CREATE TABLE USERS (
+CREATE TABLE users (
     id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     surname VARCHAR(100) DEFAULT NULL, 
@@ -16,7 +16,7 @@ CREATE TABLE USERS (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE RESTAURANT (
+CREATE TABLE restaurant (
     id CHAR(36) PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     email VARCHAR(50) UNIQUE,
@@ -29,7 +29,7 @@ CREATE TABLE RESTAURANT (
     INDEX idx_name_address (name, address)
 );
 
-CREATE TABLE METHODS_PAYMENT (
+CREATE TABLE methods_payment (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) UNIQUE NOT NULL,         
     icon_url VARCHAR(255) NULL                 
@@ -39,24 +39,24 @@ CREATE TABLE METHODS_PAYMENT (
 -- 2. Tablas relacionadas 
 -- ----------------------------------------------------
 
-CREATE TABLE RESTAURANT_PAYMENTS (
+CREATE TABLE restaurant_payments (
     restaurant_id CHAR(36) NOT NULL,
     method_payment_id INT NOT NULL,
     PRIMARY KEY (restaurant_id, method_payment_id),
-    FOREIGN KEY (restaurant_id) REFERENCES RESTAURANT(id) ON DELETE CASCADE,
-    FOREIGN KEY (method_payment_id) REFERENCES METHODS_PAYMENT(id) ON DELETE CASCADE,
+    FOREIGN KEY (restaurant_id) REFERENCES restaurant(id) ON DELETE CASCADE,
+    FOREIGN KEY (method_payment_id) REFERENCES methods_payment(id) ON DELETE CASCADE,
     INDEX idx_payment_restaurant (method_payment_id, restaurant_id)
 );
 
-CREATE TABLE MENU (
+CREATE TABLE menu (
     id CHAR(36) PRIMARY KEY,
     restaurant_id CHAR(36) NOT NULL,
     name VARCHAR(100),
     description TEXT,
-    FOREIGN KEY (restaurant_id) REFERENCES RESTAURANT(id) ON DELETE CASCADE
+    FOREIGN KEY (restaurant_id) REFERENCES restaurant(id) ON DELETE CASCADE
 );
 
-CREATE TABLE DISHES (
+CREATE TABLE dishes (
     id CHAR(36) PRIMARY KEY,
     restaurant_id CHAR(36) NOT NULL,          
     menu_id CHAR(36) NULL,                    
@@ -64,26 +64,26 @@ CREATE TABLE DISHES (
     description TEXT,
     price DECIMAL(6,2),
     category VARCHAR(50),                     
-    FOREIGN KEY (restaurant_id) REFERENCES RESTAURANT(id) ON DELETE CASCADE,
-    FOREIGN KEY (menu_id) REFERENCES MENU(id) ON DELETE SET NULL,
+    FOREIGN KEY (restaurant_id) REFERENCES restaurant(id) ON DELETE CASCADE,
+    FOREIGN KEY (menu_id) REFERENCES menu(id) ON DELETE SET NULL,
     CONSTRAINT unique_dish_name_per_restaurant UNIQUE (restaurant_id, name),
     -- Índice añadido para la búsqueda masiva de platos de tu controlador anterior
     INDEX idx_restaurant_menu_category (restaurant_id, menu_id, category) 
 );
 
-CREATE TABLE REFRESH_TOKENS (
+CREATE TABLE refresh_tokens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(255) NOT NULL,
     token TEXT NOT NULL,
     expires_at TIMESTAMP NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- ----------------------------------------------------
 -- 3. Tablas polimórficas (Localización e Imágenes)
 -- ----------------------------------------------------
 
-CREATE TABLE IMAGES (
+CREATE TABLE images (
     id CHAR(36) PRIMARY KEY,
     relatedId CHAR(36) NOT NULL,
     relatedType VARCHAR(50) NOT NULL,
@@ -92,7 +92,7 @@ CREATE TABLE IMAGES (
     INDEX idx_images_polymorphic (relatedId, relatedType)
 );
 
-CREATE TABLE LOCATION (
+CREATE TABLE location (
     id CHAR(36) PRIMARY KEY,
     relatedId CHAR(36) NOT NULL,
     relatedType VARCHAR(50) NOT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE LOCATION (
 -- 4. Seguridad y rendimiento
 -- ----------------------------------------------------
 
-CREATE TABLE BlacklistEntry (
+CREATE TABLE blacklist_entry (
     id INT AUTO_INCREMENT PRIMARY KEY,
     value VARCHAR(255) NOT NULL,
     type VARCHAR(50) NOT NULL,
@@ -120,13 +120,13 @@ CREATE TABLE BlacklistEntry (
     CONSTRAINT unique_value_type UNIQUE (value, type)
 );
 
-CREATE INDEX idx_blacklist_lookup ON BlacklistEntry (value, type, expires_at);
+CREATE INDEX idx_blacklist_lookup ON blacklist_entry (value, type, expires_at);
 
 -- ----------------------------------------------------
 -- 5. VISTA: Corregida para agrupar sin la columna JSON
 -- ----------------------------------------------------
 
-CREATE OR REPLACE VIEW V_RESTAURANTS AS
+CREATE OR REPLACE VIEW v_restaurants AS
 SELECT 
     r.id,
     r.name,
@@ -143,8 +143,8 @@ SELECT
         COALESCE(AVG(CASE WHEN d.category = 'bebidas'   THEN d.price END), 0.00), 
         2
     ) AS average_price
-FROM RESTAURANT r
-LEFT JOIN DISHES d ON r.id = d.restaurant_id
+FROM restaurant r
+LEFT JOIN dishes d ON r.id = d.restaurant_id
 GROUP BY 
     r.id, 
     r.name, 
@@ -161,7 +161,7 @@ GROUP BY
 -- ----------------------------------------------------
 
 -- ----------------------------------------------------
-INSERT INTO METHODS_PAYMENT (name, icon_url) VALUES 
+INSERT INTO methods_payment (name, icon_url) VALUES 
 ('Efectivo', 'https://res.cloudinary.com/dlxgtpema/image/upload/v1780251884/cash_sqndkx.svg'),
 ('Visa', 'https://res.cloudinary.com/dlxgtpema/image/upload/v1780251883/visa_pcdahv.svg'),
 ('Apple Pay', 'https://res.cloudinary.com/dlxgtpema/image/upload/v1780251883/apple_pay_mg6p2a.svg'),
