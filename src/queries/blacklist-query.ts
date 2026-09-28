@@ -1,10 +1,10 @@
 const addTokenBlackList = (): string => {
-  const query = `INSERT INTO blacklistEntry (value, type, expires_at, reason) VALUES (?, ?, ?, ?)`;
+  const query = `INSERT INTO blacklist_entry (value, type, expires_at, reason) VALUES (?, ?, ?, ?)`;
   return query;
 };
 
 const searchTokenBlacklist = (): string => {
-  const query = `SELECT value FROM blacklistEntry WHERE value = ? LIMIT 1`;
+  const query = `SELECT value FROM blacklist_entry WHERE value = ? LIMIT 1`;
   return query;
 };
 
