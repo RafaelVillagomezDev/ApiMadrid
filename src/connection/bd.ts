@@ -3,7 +3,12 @@ import { BdInterface } from '../types/bd-type';
 import dotenv from 'dotenv';
 import path from 'path';
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
+const env = process.env.NODE_ENV || 'development';
+const envFileName = env === 'development' ? '.env.development' : '.env';
+
+
+dotenv.config({ path: path.resolve(process.cwd(), envFileName) });
 
 if (
   !process.env.DBHOST ||
@@ -12,7 +17,7 @@ if (
   !process.env.DBDATABASE ||
   !process.env.DBPORT
 ) {
-  throw new Error('Variables de entorno vacias');
+  throw new Error(`Variables de entorno vacias. Entorno actual: ${envFileName}`);
 }
 
 const connection: BdInterface = {

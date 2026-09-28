@@ -80,7 +80,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-const port: number = Number(process.env.PORT) || 3000;
+const port: number = Number(process.env.PORT) || 4000;
 
 
 app.use(requestLogger);
