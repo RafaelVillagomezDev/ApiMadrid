@@ -5,19 +5,19 @@ const createRefreshTokenQuery = (): string => {
 const findValidTokenQuery = (): string => {
 
     const query = `
-        SELECT * FROM REFRESH_TOKENS 
+        SELECT * FROM refresh_tokens
         WHERE token = ? AND expires_at > NOW()
       `;
       return query;
 }
 
 const deleteTokenByIdQuery = (): string => {
-     const query = `DELETE FROM REFRESH_TOKENS WHERE id = ?`;
+     const query = `DELETE FROM refresh_tokens WHERE id = ?`;
      return query;
 }
 
 const deleteAllTokensByUserQuery = (): string => {
-     const query = `DELETE FROM REFRESH_TOKENS WHERE user_id = ?`;
+     const query = `DELETE FROM refresh_tokens WHERE user_id = ?`;
         return query;
 }
 

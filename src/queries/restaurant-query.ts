@@ -8,7 +8,7 @@ interface FormatBatchInput {
 
 
 const createRestaurant = (): string => {
-  const query = `INSERT IGNORE INTO RESTAURANT (id,email,name,address,description,phone,type_food,web) VALUES (?, ?, ?, ?,?,?,?,?);`;
+  const query = `INSERT IGNORE INTO restaurant (id,email,name,address,description,phone,type_food,web) VALUES (?, ?, ?, ?,?,?,?,?);`;
   return query;
 };
 

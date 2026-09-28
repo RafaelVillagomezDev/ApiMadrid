@@ -15,12 +15,12 @@ const createUser = (): string => {
 };
 
 const getUserByEmail = (): string => {
-  const query = `SELECT id, email, name, surname, password, role FROM USERS WHERE email = ?`;
+  const query = `SELECT id, email, name, surname, password, role FROM users WHERE email = ?`;
   return query;
 };
 
 const getUserById = (): string => {
-  const query = `SELECT id, email, name, surname, password, role FROM USERS WHERE id = ?`;
+  const query = `SELECT id, email, name, surname, password, role FROM users WHERE id = ?`;
   return query;
 };
 
